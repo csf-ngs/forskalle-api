@@ -8,7 +8,7 @@ import datetime
 class FskApi:
   default_file_name = '~/.fsk_api.yml'
 
-  def __init__(self, base=os.environ.get('FSK_API_BASE', None), key=os.environ.get('FSK_API_BASE', None), api_conf=default_file_name):
+  def __init__(self, base=os.environ.get('FSK_API_BASE', None), key=os.environ.get('FSK_API_KEY', None), api_conf=default_file_name):
     if not base or not key:
       with open(os.path.expanduser(api_conf), 'rb') as yml:
         cfg = yaml.load(yml, Loader=yaml.SafeLoader)
@@ -17,7 +17,7 @@ class FskApi:
       if not key:
         key=cfg['fsk_api_key']
     if not base or not key:
-      raise Exception("Please configure FSK_API_BASE and FSK_API_BASE!")
+      raise Exception("Please configure FSK_API_BASE and FSK_API_KEY!")
     self.base=base
     self.key=key
     self.username=None
