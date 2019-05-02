@@ -18,6 +18,9 @@ class FskApi:
         key=cfg['fsk_api_key']
     if not base or not key:
       raise Exception("Please configure FSK_API_BASE and FSK_API_KEY!")
+    if base.endswith('/'):
+      base = base[:-1]
+
     self.base=base
     self.key=key
     self.username=None
@@ -79,7 +82,7 @@ class FskApi:
     return json
   
   def current_key(self):
-    json = self.get("api/key")
+    json = self.get("/api/key")
     self.username = json['user']['username']
     return json
 
