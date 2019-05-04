@@ -7,7 +7,7 @@ Python library for Fsk3 API. Will add functionality as needed.
 Install from the VBCF.NGS repository:
 
 ```
-pip install git+https://ngs.vbcf.ac.at/repo/ngs-software/fsk-api.git
+pip install git+https://ngs.vbcf.ac.at/repo/software/forskalle-api.git
 ```
 
 ## Usage
