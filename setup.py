@@ -2,7 +2,7 @@ from io import open
 
 from setuptools import find_packages, setup
 
-with open('fsk_api/__init__.py', 'r') as f:
+with open('forskalle_api/__init__.py', 'r') as f:
     for line in f:
         if line.startswith('__version__'):
             version = line.strip().split('=')[1].strip(' \'"')
@@ -16,7 +16,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 REQUIRES = ['click', 'requests', 'PyYAML']
 
 setup(
-    name='fsk-api',
+    name='forskalle-api',
     version=version,
     description='Library for Fsk3 API',
     long_description=readme,
@@ -25,7 +25,7 @@ setup(
     author_email='heinz.ekker@vbcf.ac.at',
     maintainer='Heinz Axelsson-Ekker',
     maintainer_email='heinz.ekker@vbcf.ac.at',
-    url='https://ngs.vbcf.ac.at/repo/ngs-software/fsk-api',
+    url='https://ngs.vbcf.ac.at/repo/software/forskalle-api',
 
     keywords=[
         '',
@@ -51,7 +51,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': {
-            'fsk-cli = fsk_api.cli:cli',
+            'fsk-cli = forskalle_api.cli:cli',
         }
     }
 )

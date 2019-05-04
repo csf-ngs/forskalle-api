@@ -30,8 +30,8 @@ class FskApi:
       json = r.json()
     except:
       r.raise_for_status()
-    if 'message' in json:
-      raise Exception("FSK-ERROR: {message}".format(message=json['message']))
+    if 'errors' in json:
+      raise Exception("FSK-ERROR: {status} {code} {detail}".format(**json['errors'][0]))
     else:
       r.raise_for_status()
 

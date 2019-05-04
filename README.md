@@ -28,7 +28,7 @@ Try `fsk-cli --help` for some hints!
 ### Library
 
 ```
-from fsk_api import FskApi
+from forskalle_api import FskApi
 
 fsk_api = FskApi()
 sample_json = fsk_api.get_sample(54321)
