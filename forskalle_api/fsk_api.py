@@ -90,13 +90,13 @@ class FskApi:
     return self.get("/api/scientists", params=params)
   
   def get_scientist(self, id):
-    return self.get("/api/scientists/{id}")
+    return self.get("/api/scientists/{id}".format(id=id))
 
   def list_groups(self, params=None):
     return self.get("/api/groups", params=params)
   
   def get_group(self, id):
-    return self.get("/api/groups/{id}")
+    return self.get("/api/groups/{id}".format(id=id))
 
   def _publish_download(self, where, unique_id, path, link, size, md5):
     return self.post("/api/runs/{where}/smrtcells/{unique_id}".format(where=where, unique_id=unique_id), {
