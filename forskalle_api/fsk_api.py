@@ -82,9 +82,6 @@ class FskApi:
   def admin_list_samples(self, params=None):
     return self.get("/api/samples/admin", params=params)
   
-  def get_sample(self, id):
-    return self.get("/api/samples/{id}".format(id=id))
-  
   def current_account(self):
     json = self.get("/api/account")
     self.username=json['username']
@@ -163,12 +160,19 @@ class FskApi:
   def get_nanopore_barcodes(self, run_id):
     return self.get("/api/runs/ont/flowcelL_runs/{run_id}/barcodes".format(run_id=run_id))
 
+
+  def get_sample(self, id):
+    return self.get("/api/samples/{id}".format(id=id))
+
   def get_sample_sequencing_runs(self, sample_id, csv=False):
     url = "/api/samples/{sample_id}/sequencing".format(sample_id=sample_id)
     if csv:
       return self.get_csv(url+'.csv')
     else:
       return self.get(url)
+  
+  def get_multi(self, id):
+    return self.get('/api/multiplexes/{multi_id}'.format(multi_id=id))
   
 
 

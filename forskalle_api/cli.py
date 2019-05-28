@@ -10,12 +10,6 @@ def cli(debug):
     """Fsk3 CLI - sequencing metadata made easy."""
     pass
 
-@cli.command(short_help='get sample metadata')
-@click.argument('sample_id')
-def get_sample(sample_id):
-  ret = FskApi().get_sample(sample_id)
-  print(json.dumps(ret, indent=2))
-
 @cli.command(short_help='get barcodes for a lane/smrtcell/nanopore run')
 @click.argument('identifier')
 @click.option('--platform', '-p', default='Illumina', help='Illumina, Pacbio or ONT')
@@ -42,6 +36,12 @@ def post_report_url(unique_id, url):
   ret = FskApi().publish_smrtcell_report(unique_id, url)
   print(json.dumps(ret, indent=2))
 
+@cli.command(short_help='get sample metadata')
+@click.argument('sample_id')
+def get_sample(sample_id):
+  ret = FskApi().get_sample(sample_id)
+  print(json.dumps(ret, indent=2))
+
 @cli.command(short_help='get sequencing runs for a sample')
 @click.argument('sample_id')
 @click.option('--csv', is_flag=True)
@@ -51,3 +51,11 @@ def get_sample_sequencing(sample_id, csv=False):
     print(ret)
   else:
     print(json.dumps(ret, indent=2))
+
+@cli.command(short_help='get multiplex metadata')
+@click.argument('multi_id')
+def get_multi(multi_id):
+  if multi_id.startswith('M'):
+    multi_id = multi_id[1:]
+  ret = FskApi().get_multi(multi_id)
+  print(json.dumps(ret, indent=2))
