@@ -37,12 +37,21 @@ class FskApi:
 
   def make_headers(self):
     return { 'X-API-Key': self.key, 'Accept': 'application/json' }
-
+  
   def get(self, route, params=None):
     r = requests.get(self.base+route, headers=self.make_headers(), params=params)
     if r.status_code != requests.codes.ok:
       self.handle_error(r)
     return r.json()
+
+  def get_csv(self, route, params=None):
+    headers = self.make_headers()
+    headers['Accept']='text/csv'
+    r = requests.get(self.base+route, headers=headers, params=params)
+    if r.status_code != requests.codes.ok:
+      self.handle_error(r)
+    return r.text
+
 
   def post(self, route, data):
     r = requests.post(self.base+route, headers=self.make_headers(), json=data)
@@ -118,6 +127,9 @@ class FskApi:
   def import_subreadset(self, subreadset):
     return self.post("/api/runs/pacbio/subreadset", { 'xml': subreadset })
   
+  def get_illumina_barcodes(self, flowcell_id, lane):
+    return self.get("/api/runs/illumina/{flowcell_id}/{lane}/barcodes".format(flowcell_id=flowcell_id, lane=lane))
+  
   def get_smrtcell_barcodes(self, unique_id):
     return self.get("/api/runs/pacbio/smrtcells/{unique_id}/barcodes".format(unique_id=unique_id))
 
@@ -151,6 +163,12 @@ class FskApi:
   def get_nanopore_barcodes(self, run_id):
     return self.get("/api/runs/ont/flowcelL_runs/{run_id}/barcodes".format(run_id=run_id))
 
+  def get_sample_sequencing_runs(self, sample_id, csv=False):
+    url = "/api/samples/{sample_id}/sequencing".format(sample_id=sample_id)
+    if csv:
+      return self.get_csv(url+'.csv')
+    else:
+      return self.get(url)
   
 
 
