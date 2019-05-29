@@ -76,12 +76,6 @@ class FskApi:
         self.handle_error(r)
     return r.json()
 
-  def list_samples(self, params=None):
-    return self.get("/api/samples", params=params)
-  
-  def admin_list_samples(self, params=None):
-    return self.get("/api/samples/admin", params=params)
-  
   def current_account(self):
     json = self.get("/api/account")
     self.username=json['username']
@@ -160,6 +154,32 @@ class FskApi:
   def get_nanopore_barcodes(self, run_id):
     return self.get("/api/runs/ont/flowcelL_runs/{run_id}/barcodes".format(run_id=run_id))
 
+  def list_sequenced_samples(self, params=None, csv=False):
+    if csv:
+      return self.get_csv("/api/sequenced_samples.csv", params=params)
+    else:
+      return self.get("/api/sequenced_samples", params=params)
+
+  def admin_list_sequenced_samples(self, params=None, csv=False):
+    if csv:
+      return self.get_csv("/api/sequenced_samples/admin.csv", params=params)
+    else:
+      return self.get("/api/sequenced_samples/admin", params=params)
+
+  def get_sequenced_sample(self, id):
+    return self.get("/api/sequenced_samples/{id}".format(id=id))
+
+  def list_samples(self, params=None, csv=False):
+    if csv:
+      return self.get_csv("/api/samples.csv", params=params)
+    else:
+      return self.get("/api/samples", params=params)
+  
+  def admin_list_samples(self, params=None, csv=False):
+    if csv:
+      return self.get_csv("/api/samples/admin.csv", params=params)
+    else:
+      return self.get("/api/samples/admin", params=params)
 
   def get_sample(self, id):
     return self.get("/api/samples/{id}".format(id=id))
