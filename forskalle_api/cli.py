@@ -4,11 +4,15 @@ import click
 import json
 from forskalle_api.fsk_api import FskApi
 
-def parse_paging(params, limit, page):
-  if limit > 0 and page > 0:
-    params['page']=page
-    params['limit']=limit
-  return params
+from forskalle_api.fsk_query import FskPagedQuery, FskQuery
+from forskalle_api.auto.queryparams import SampleFilters, SequencedSampleFilters, MultiplexFilters, RequestFilters
+
+def make_query(filters, limit, page):
+  if page != 0:
+    query = FskPagedQuery(filters=filters, page=page, limit=limit)
+  else:
+    query = FskQuery(filters=filters)
+  return query
 
 
 @click.group()
@@ -52,13 +56,8 @@ def post_report_url(unique_id, url):
 @click.option('--csv', is_flag=True)
 @click.option('--admin', is_flag=True, help='Show all users, available only with API key')
 def list_sequenced_samples(sample, multi, request, limit, page, csv, admin):
-  params = parse_paging({}, limit, page)
-  if sample != None:
-    params['filter.sample_id']=sample
-  if admin:
-    ret = FskApi().admin_list_sequenced_samples(params, csv)
-  else:
-    ret = FskApi().list_sequenced_samples(params, csv)
+  filters = SequencedSampleFilters(sample_id=sample, multi_id=multi, request_id=request)
+  ret = FskApi().list_sequenced_samples(make_query(filters, limit, page), csv, admin)
   if csv:
     print(ret)
   else:
@@ -68,23 +67,15 @@ def list_sequenced_samples(sample, multi, request, limit, page, csv, admin):
 @cli.command(short_help='list samples')
 @click.option('--id_from', help='min id', type=int)
 @click.option('--id_to', help='max id', type=int)
+@click.option('--scientist', help="Scientist name, only usefule with admin query")
+@click.option('--group', help="Group name, only usefule with admin query")
 @click.option('--limit', '-l', help='max rows', type=int, default=100)
 @click.option('--page', '-p', help='Page (to return next [limit] rows', type=int, default=1)
 @click.option('--csv', is_flag=True)
 @click.option('--admin', is_flag=True, help='Show all users, available only with API key')
-def list_samples(id_from, id_to, limit, page, csv, admin):
-  params = parse_paging({}, limit, page)
-  if page != 0:
-    params['limit']=limit
-    params['page']=page
-  if id_from != None:
-    params['filter.id_from']=id_from
-  if id_to != None:
-    params['filter.id_to']=id_to
-  if admin:
-    ret = FskApi().admin_list_samples(params, csv)
-  else:
-    ret = FskApi().list_samples(params, csv)
+def list_samples(id_from, id_to, scientist, group, limit, page, csv, admin):
+  filters = SampleFilters(id_from=id_from, id_to=id_to, scientist=scientist, group=group)
+  ret = FskApi().list_samples(make_query(filters, limit, page), csv, admin)
   if csv:
     print(ret)
   else:
@@ -107,10 +98,49 @@ def get_sample_sequencing(sample_id, csv=False):
   else:
     print(json.dumps(ret, indent=2))
 
+
+@cli.command(short_help='list multiplexes')
+@click.option('--scientist', help="Scientist name, only usefule with admin query")
+@click.option('--group', help="Group name, only usefule with admin query")
+@click.option('--limit', '-l', help='max rows', type=int, default=100)
+@click.option('--page', '-p', help='Page (to return next [limit] rows', type=int, default=1)
+@click.option('--csv', is_flag=True)
+@click.option('--admin', is_flag=True, help='Show all users, available only with API key')
+def list_multis(scientist, group, limit, page, csv, admin):
+  filters = MultiplexFilters(scientist=scientist, group=group)
+  ret = FskApi().list_multis(make_query(filters, limit, page), csv, admin)
+  if csv:
+    print(ret)
+  else:
+    print(json.dumps(ret, indent=2))
+
 @cli.command(short_help='get multiplex metadata')
 @click.argument('multi_id')
 def get_multi(multi_id):
   if multi_id.startswith('M'):
     multi_id = multi_id[1:]
   ret = FskApi().get_multi(multi_id)
+  print(json.dumps(ret, indent=2))
+
+@cli.command(short_help='list requests')
+@click.option('--scientist', help="Scientist name, only usefule with admin query")
+@click.option('--group', help="Group name, only usefule with admin query")
+@click.option('--limit', '-l', help='max rows', type=int, default=100)
+@click.option('--page', '-p', help='Page (to return next [limit] rows', type=int, default=1)
+@click.option('--csv', is_flag=True)
+@click.option('--admin', is_flag=True, help='Show all users, available only with API key')
+def list_requests(scientist, group, limit, page, csv, admin):
+  filters = RequestFilters(scientist=scientist, group=group)
+  ret = FskApi().list_requests(make_query(filters, limit, page), csv, admin)
+  if csv:
+    print(ret)
+  else:
+    print(json.dumps(ret, indent=2))
+
+@cli.command(short_help='get request metadata')
+@click.argument('request_id')
+def get_request(request_id):
+  if request_id.startswith('R'):
+    request_id = request_id[1:]
+  ret = FskApi().get_request(request_id)
   print(json.dumps(ret, indent=2))

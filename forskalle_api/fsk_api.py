@@ -39,6 +39,8 @@ class FskApi:
     return { 'X-API-Key': self.key, 'Accept': 'application/json' }
   
   def get(self, route, params=None):
+    if params and type(params).__name__ != 'dict':
+      params = params.generate_params()
     r = requests.get(self.base+route, headers=self.make_headers(), params=params)
     if r.status_code != requests.codes.ok:
       self.handle_error(r)
@@ -154,32 +156,32 @@ class FskApi:
   def get_nanopore_barcodes(self, run_id):
     return self.get("/api/runs/ont/flowcelL_runs/{run_id}/barcodes".format(run_id=run_id))
 
-  def list_sequenced_samples(self, params=None, csv=False):
+  def list_sequenced_samples(self, params=None, csv=False, admin=False):
+    base = "/api/sequenced_samples"
+    if admin:
+      base += "/admin"
     if csv:
-      return self.get_csv("/api/sequenced_samples.csv", params=params)
+      return self.get_csv(base+".csv", params=params)
     else:
-      return self.get("/api/sequenced_samples", params=params)
+      return self.get(base, params=params)
 
   def admin_list_sequenced_samples(self, params=None, csv=False):
-    if csv:
-      return self.get_csv("/api/sequenced_samples/admin.csv", params=params)
-    else:
-      return self.get("/api/sequenced_samples/admin", params=params)
+    return self.list_sequenced_samples(params, csv, admin=True)
 
   def get_sequenced_sample(self, id):
     return self.get("/api/sequenced_samples/{id}".format(id=id))
 
-  def list_samples(self, params=None, csv=False):
+  def list_samples(self, params=None, csv=False, admin=False):
+    base = "/api/samples"
+    if admin:
+      base += "/admin"
     if csv:
-      return self.get_csv("/api/samples.csv", params=params)
+      return self.get_csv(base+".csv", params=params)
     else:
-      return self.get("/api/samples", params=params)
+      return self.get(base, params=params)
   
   def admin_list_samples(self, params=None, csv=False):
-    if csv:
-      return self.get_csv("/api/samples/admin.csv", params=params)
-    else:
-      return self.get("/api/samples/admin", params=params)
+    return self.list_samples(params, csv, admin=True)
 
   def get_sample(self, id):
     return self.get("/api/samples/{id}".format(id=id))
@@ -193,6 +195,27 @@ class FskApi:
   
   def get_multi(self, id):
     return self.get('/api/multiplexes/{multi_id}'.format(multi_id=id))
+  
+  def list_multis(self, params=None, csv=False, admin=False):
+    base = "/api/multiplexes"+("/admin" if admin else "")
+    if csv:
+      return self.get_csv(base+".csv", params=params)
+    else:
+      return self.get(base, params=params)
+    
+  def get_request(self, id):
+    return self.get("/api/requests/{request_id}".format(request_id=id))
+    
+  def admin_list_multis(self, params=None, csv=False):
+    return self.list_multis(params, csv, admin=True)
+  
+  def list_requests(self, params=None, csv=False, admin=False):
+    base = "/api/requests"+("/admin" if admin else "")
+    if csv:
+      return self.get_csv(base+".csv", params=params)
+    else:
+      return self.get(base, params=params)
+
   
 
 
