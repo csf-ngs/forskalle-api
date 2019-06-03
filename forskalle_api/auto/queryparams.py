@@ -60,7 +60,8 @@ class IlluminaRunSorts:
 
 
 class MultiplexFilters:
-  def __init__(self, description=None, group=None, platform=None, received_after=None, received_before=None, sample_antibody=None, sample_celltype=None, sample_description=None, sample_exptype=None, sample_genotype=None, sample_organism=None, sample_tissue_type=None, sample_treatment=None, scientist=None):
+  def __init__(self, available_samples=None, description=None, group=None, platform=None, received_after=None, received_before=None, sample_antibody=None, sample_celltype=None, sample_description=None, sample_exptype=None, sample_genotype=None, sample_organism=None, sample_tissue_type=None, sample_treatment=None, scientist=None):
+    self.available_samples = available_samples
     self.description = description
     self.group = group
     self.platform = platform
@@ -257,8 +258,9 @@ class RunSorts:
 
 
 class SampleFilters:
-  def __init__(self, antibody=None, celltype=None, changed_since=None, comments=None, description=None, exptype=None, genotype=None, group=None, id_from=None, id_to=None, organism=None, platform=None, preparation_kit=None, preparation_type=None, ready_after=None, ready_before=None, received_after=None, received_before=None, request_status=None, scientist=None, status=None, tissue_type=None, treatment=None):
+  def __init__(self, antibody=None, available=None, celltype=None, changed_since=None, comments=None, description=None, exptype=None, genotype=None, group=None, id_from=None, id_to=None, multi_id=None, organism=None, platform=None, preparation_kit=None, preparation_type=None, ready_after=None, ready_before=None, received_after=None, received_before=None, request_id=None, request_status=None, scientist=None, status=None, tissue_type=None, treatment=None):
     self.antibody = antibody
+    self.available = available
     self.celltype = celltype
     self.changed_since = changed_since
     self.comments = comments
@@ -268,6 +270,7 @@ class SampleFilters:
     self.group = group
     self.id_from = id_from
     self.id_to = id_to
+    self.multi_id = multi_id
     self.organism = organism
     self.platform = platform
     self.preparation_kit = preparation_kit
@@ -276,6 +279,7 @@ class SampleFilters:
     self.ready_before = ready_before
     self.received_after = received_after
     self.received_before = received_before
+    self.request_id = request_id
     self.request_status = request_status
     self.scientist = scientist
     self.status = status
