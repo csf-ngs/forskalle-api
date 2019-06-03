@@ -5,6 +5,18 @@ import os.path
 import yaml
 import datetime
 
+class FskError(Exception):
+  def __init__(self, status, code, detail, doclink=None, line=None, **kwargs):
+    self.status = status
+    self.code = code
+    self.detail = detail
+    self.doclink = doclink
+    self.line = line
+    self.args = kwargs
+  
+  def __str__(self):
+    return "FSK-ERROR: {status} {code} {detail}".format(status=self.status, code=self.code, detail=self.detail)
+
 class FskApi:
   default_file_name = '~/.fsk_api.yml'
 
@@ -31,7 +43,7 @@ class FskApi:
     except:
       r.raise_for_status()
     if 'errors' in json:
-      raise Exception("FSK-ERROR: {status} {code} {detail}".format(**json['errors'][0]))
+      raise FskError(**json['errors'][0])
     else:
       r.raise_for_status()
 
