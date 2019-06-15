@@ -40,12 +40,20 @@ def get_barcodes(identifier, platform='Illumina'):
   print(json.dumps(ret, indent=2))
     
 
-@cli.command(short_help='register smrtcell report URL in Forskalle')
+@cli.command(short_help='register smrtcell report URL in Forskalle (admin only)')
 @click.argument('unique_id')
 @click.argument('url')
-def post_report_url(unique_id, url):
+def post_pacbio_report_url(unique_id, url):
   ret = FskApi().publish_smrtcell_report(unique_id, url)
   print(json.dumps(ret, indent=2))
+
+@cli.command(short_help='register nanopore report URL in Forskalle (admin only)')
+@click.argument('unique_id')
+@click.argument('url')
+def post_nanopore_report_url(unique_id, url):
+  ret = FskApi().publish_nanopore_report(unique_id, url)
+  print(json.dumps(ret, indent=2))
+
 
 @cli.command(short_help='list sequenced samples')
 @click.option('--sample', '-s', help='sample id (can be specified multiple times)', multiple=True)
@@ -67,12 +75,12 @@ def list_sequenced_samples(sample, multi, request, limit, page, csv, admin):
 @cli.command(short_help='list samples')
 @click.option('--id_from', help='min id', type=int)
 @click.option('--id_to', help='max id', type=int)
-@click.option('--scientist', help="Scientist name, only usefule with admin query")
-@click.option('--group', help="Group name, only usefule with admin query")
+@click.option('--scientist', help="Scientist name, only useful with admin query")
+@click.option('--group', help="Group name, only useful with admin query")
 @click.option('--limit', '-l', help='max rows', type=int, default=100)
 @click.option('--page', '-p', help='Page (to return next [limit] rows', type=int, default=1)
 @click.option('--csv', is_flag=True)
-@click.option('--admin', is_flag=True, help='Show all users, available only with API key')
+@click.option('--admin', is_flag=True, help='Show all users, available only with admin key')
 def list_samples(id_from, id_to, scientist, group, limit, page, csv, admin):
   filters = SampleFilters(id_from=id_from, id_to=id_to, scientist=scientist, group=group)
   ret = FskApi().list_samples(make_query(filters, limit, page), csv, admin)
@@ -100,12 +108,12 @@ def get_sample_sequencing(sample_id, csv=False):
 
 
 @cli.command(short_help='list multiplexes')
-@click.option('--scientist', help="Scientist name, only usefule with admin query")
-@click.option('--group', help="Group name, only usefule with admin query")
+@click.option('--scientist', help="Scientist name, only useful with admin query")
+@click.option('--group', help="Group name, only useful with admin query")
 @click.option('--limit', '-l', help='max rows', type=int, default=100)
 @click.option('--page', '-p', help='Page (to return next [limit] rows', type=int, default=1)
 @click.option('--csv', is_flag=True)
-@click.option('--admin', is_flag=True, help='Show all users, available only with API key')
+@click.option('--admin', is_flag=True, help='Show all users, available only with admin key')
 def list_multis(scientist, group, limit, page, csv, admin):
   filters = MultiplexFilters(scientist=scientist, group=group)
   ret = FskApi().list_multis(make_query(filters, limit, page), csv, admin)
@@ -123,12 +131,12 @@ def get_multi(multi_id):
   print(json.dumps(ret, indent=2))
 
 @cli.command(short_help='list requests')
-@click.option('--scientist', help="Scientist name, only usefule with admin query")
-@click.option('--group', help="Group name, only usefule with admin query")
+@click.option('--scientist', help="Scientist name, only useful with admin query")
+@click.option('--group', help="Group name, only useful with admin query")
 @click.option('--limit', '-l', help='max rows', type=int, default=100)
 @click.option('--page', '-p', help='Page (to return next [limit] rows', type=int, default=1)
 @click.option('--csv', is_flag=True)
-@click.option('--admin', is_flag=True, help='Show all users, available only with API key')
+@click.option('--admin', is_flag=True, help='Show all users, available only with admin key')
 def list_requests(scientist, group, limit, page, csv, admin):
   filters = RequestFilters(scientist=scientist, group=group)
   ret = FskApi().list_requests(make_query(filters, limit, page), csv, admin)
