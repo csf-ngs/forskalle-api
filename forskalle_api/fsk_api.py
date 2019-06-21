@@ -159,7 +159,7 @@ class FskApi:
   def publish_nanopore_download(self, run_id, **kwargs):
     return self._publish_download(where='ont', unique_id=run_id, **kwargs)
 
-  def post_ont_results(self, run_id, results):
+  def post_nanopore_results(self, run_id, results):
     return self.post("/api/runs/ont/flowcell_runs/{run_id}/results".format(run_id=run_id), results)
   
   def publish_nanopore_report(self, run_id, report_url):
