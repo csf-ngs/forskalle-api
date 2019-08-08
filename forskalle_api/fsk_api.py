@@ -4,6 +4,7 @@ import os
 import os.path
 import yaml
 import datetime
+from uuid import uuid4
 
 class FskError(Exception):
   def __init__(self, status, code, detail, doclink=None, line=None, **kwargs):
@@ -112,8 +113,20 @@ class FskApi:
   def get_group(self, id):
     return self.get("/api/groups/{id}".format(id=id))
 
-  def _publish_download(self, where, unique_id, path, link, size, md5):
-    return self.post("/api/runs/{where}/smrtcells/{unique_id}".format(where=where, unique_id=unique_id), {
+  def _publish_download(self, where, unique_id, path, link=None, size=None, md5=None):
+    if not link:
+      uuid = str(uuid4())[0:8]
+      link = uuid + '_'+os.path.basename(path)
+    if not size:
+      size = os.path.getsize(path)
+    if not md5:
+      if not os.path.exists(path + '.md5'):
+        raise Exception("md5 not provided and {path}.md5 not found.".format(path=path))
+      with open(path + '.md5') as md5fh:
+        md5=md5fh.readline().strip().split()[0]
+    
+    cell_base = 'smrtcells' if where == 'pacbio' else 'flowcell_runs'
+    return self.post("/api/runs/{where}/{cell_base}/{unique_id}".format(where=where, cell_base=cell_base, unique_id=unique_id), {
       'datafiles_path': path,
       'datafiles_url': link,
       'datafiles_size': size,
@@ -126,8 +139,8 @@ class FskApi:
   def post_smrtcell_results(self, unique_id, results):
     return self.post("/api/runs/pacbio/smrtcells/{unique_id}/results".format(unique_id=unique_id), results)
 
-  def publish_smrtcell_download(self, **kwargs):
-    return self._publish_download(where='pacbio', **kwargs)
+  def publish_smrtcell_download(self, unique_id, path, **kwargs):
+    return self._publish_download(where='pacbio', unique_id=unique_id, path=path, **kwargs)
 
   def import_subreadset(self, subreadset):
     return self.post("/api/runs/pacbio/subreadset", { 'xml': subreadset })
@@ -156,8 +169,8 @@ class FskApi:
       'copied': copied.replace('Z', '+00:00')
     })
 
-  def publish_nanopore_download(self, run_id, **kwargs):
-    return self._publish_download(where='ont', unique_id=run_id, **kwargs)
+  def publish_nanopore_download(self, run_id, path, **kwargs):
+    return self._publish_download(where='ont', unique_id=run_id, path=path, **kwargs)
 
   def post_nanopore_results(self, run_id, results):
     return self.post("/api/runs/ont/flowcell_runs/{run_id}/results".format(run_id=run_id), results)
