@@ -126,6 +126,7 @@ class FskApi:
         md5=md5fh.readline().strip().split()[0]
     
     cell_base = 'smrtcells' if where == 'pacbio' else 'flowcell_runs'
+    path = path.replace('/scratch/', '/clustertmp/')
     return self.post("/api/runs/{where}/{cell_base}/{unique_id}".format(where=where, cell_base=cell_base, unique_id=unique_id), {
       'datafiles_path': path,
       'datafiles_url': link,
