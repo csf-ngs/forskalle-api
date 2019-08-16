@@ -85,8 +85,8 @@ class FskApi:
       self.handle_error(r)
     return r.json()
 
-  def delete(self, route):
-    r = requests.delete(self.base+route, headers=self.make_headers())
+  def delete(self, route, data=None):
+    r = requests.delete(self.base+route, headers=self.make_headers(), json=data)
     if r.status_code != requests.codes.ok:
         self.handle_error(r)
     return r.json()
@@ -113,7 +113,8 @@ class FskApi:
   def get_group(self, id):
     return self.get("/api/groups/{id}".format(id=id))
 
-  def _publish_download(self, where, unique_id, path, link=None, size=None, md5=None):
+  def _prepare_datafile(self, path, link=None, size=None, md5=None):
+    path = os.path.abspath(path)
     if not link:
       uuid = str(uuid4())[0:8]
       link = uuid + '_'+os.path.basename(path)
@@ -124,6 +125,11 @@ class FskApi:
         raise Exception("md5 not provided and {path}.md5 not found.".format(path=path))
       with open(path + '.md5') as md5fh:
         md5=md5fh.readline().strip().split()[0]
+    
+    return (path, link, size, md5)
+
+  def _publish_download(self, where, unique_id, path, link=None, size=None, md5=None):
+    (path, link, size, md5) = self._prepare_datafile(path, link, size, md5)
     
     cell_base = 'smrtcells' if where == 'pacbio' else 'flowcell_runs'
     path = path.replace('/scratch/', '/clustertmp/')
@@ -241,8 +247,19 @@ class FskApi:
       return self.get_csv(base+".csv", params=params)
     else:
       return self.get(base, params=params)
-
   
-
-
-
+  def post_datafile(self, path, link=None, size=None, md5=None, filetype='Misc'):
+    (path, link, size, md5) = self._prepare_datafile(path, link, size, md5)
+    return self.post('/api/datafiles', {
+      'path': path,
+      'url': link,
+      'size': size,
+      'md5': md5,
+      'filetype': filetype,
+    })
+  
+  def delete_datafile(self, path):
+    path = os.path.abspath(path)
+    return self.delete('/api/datafiles', {
+      'path': path
+    })

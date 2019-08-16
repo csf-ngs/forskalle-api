@@ -172,3 +172,22 @@ def get_request(request_id):
     request_id = request_id[1:]
   ret = FskApi().get_request(request_id)
   print(json.dumps(ret, indent=2))
+
+@cli.command(short_help='post datafile to seqmate')
+@click.argument('path')
+@click.option('--url', '-u', help="Override automatically generated URL")
+@click.option('--size', '-s', help="Override automatically determined size")
+@click.option('--md5', '-m', help="MD5 sum, read from [path].md5 if not specified")
+@click.option('--filetype', '-f', help="Filetype", default="Misc")
+def post_datafile(path, url=None, size=None, md5=None, filetype='Misc'):
+  ret = FskApi().post_datafile(path, url, size, md5, filetype)
+  print(json.dumps(ret, indent=2))
+
+@cli.command(short_help='delete datafile')
+@click.argument('path')
+def delete_datafile(path):
+  ret = FskApi().delete_datafile(path)
+  if ret['msg'] == 'Deleted.':
+    print("Deleted.")
+  else:
+    print("Weird?")
