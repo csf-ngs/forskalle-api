@@ -109,6 +109,22 @@ def list_samples(id_from, id_to, scientist, group, limit, page, csv, admin):
   else:
     print(json.dumps(ret, indent=2))
 
+@cli.command(short_help='list samples of all groups you belong to')
+@click.option('--id_from', help='min id', type=int)
+@click.option('--id_to', help='max id', type=int)
+@click.option('--scientist', help="Scientist name")
+@click.option('--group', help="Group name, useful if you belong to many groups.")
+@click.option('--limit', '-l', help='max rows', type=int, default=100)
+@click.option('--page', '-p', help='Page (to return next [limit] rows', type=int, default=1)
+@click.option('--csv', is_flag=True)
+def list_group_samples(id_from, id_to, scientist, group, limit, page, csv):
+  filters = SampleFilters(id_from=id_from, id_to=id_to, scientist=scientist, group=group)
+  ret = FskApi().list_group_samples(make_query(filters, limit, page), csv)
+  if csv:
+    print(ret)
+  else:
+    print(json.dumps(ret, indent=2))
+
 
 @cli.command(short_help='get sample metadata')
 @click.argument('sample_id')

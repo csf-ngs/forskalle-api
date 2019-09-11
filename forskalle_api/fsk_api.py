@@ -212,6 +212,12 @@ class FskApi:
     else:
       return self.get(base, params=params)
   
+  def list_group_samples(self, params=None, csv=False):
+    if csv:
+      return self.get_csv("/api/samples/group", params=params)
+    else:
+      return self.get("/api/samples/group", params=params)
+  
   def admin_list_samples(self, params=None, csv=False):
     return self.list_samples(params, csv, admin=True)
 
