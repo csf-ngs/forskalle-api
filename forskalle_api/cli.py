@@ -21,6 +21,10 @@ def cli(debug):
     """Fsk3 CLI - sequencing metadata made easy."""
     pass
 
+@cli.command(short_help="suggest a few xkcd passphrases")
+def generate_passwords():
+  print(json.dumps(FskApi().generate_passwords(), indent=2))
+
 @cli.command(short_help='get barcodes for a lane/smrtcell/nanopore run')
 @click.argument('identifier')
 @click.option('--platform', '-p', default='Illumina', help='Illumina, Pacbio or ONT')

@@ -112,6 +112,9 @@ class FskApi:
   
   def get_group(self, id):
     return self.get("/api/groups/{id}".format(id=id))
+  
+  def generate_passwords(self):
+    return self.get("/api/scientists/generate_passwords")
 
   def _prepare_datafile(self, path, link=None, size=None, md5=None):
     path = os.path.abspath(path)
