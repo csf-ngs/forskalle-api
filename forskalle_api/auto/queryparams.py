@@ -12,7 +12,8 @@ class ChangesetSorts:
 
 
 class DataEntryFilters:
-  def __init__(self, form=None, obj_id=None, obj_type=None, username=None):
+  def __init__(self, deleted=None, form=None, obj_id=None, obj_type=None, username=None):
+    self.deleted = deleted
     self.form = form
     self.obj_id = obj_id
     self.obj_type = obj_type
@@ -136,9 +137,10 @@ class PacbioRunSorts:
 
 
 class ProjectFilters:
-  def __init__(self, completed_after=None, completed_before=None, cost_assignment=None, created_after=None, created_before=None, group=None, last_request_after=None, last_request_before=None, name=None, scientist=None, status=None):
+  def __init__(self, completed_after=None, completed_before=None, control=None, cost_assignment=None, created_after=None, created_before=None, group=None, last_request_after=None, last_request_before=None, name=None, scientist=None, status=None):
     self.completed_after = completed_after
     self.completed_before = completed_before
+    self.control = control
     self.cost_assignment = cost_assignment
     self.created_after = created_after
     self.created_before = created_before
@@ -215,13 +217,15 @@ class RequestDraftSorts:
 
 
 class RequestLaneFilters:
-  def __init__(self, accepted_after=None, accepted_before=None, long_seqtype=None, request_lane=None, share_status=None, short_seqtype=None, status=None):
+  def __init__(self, accepted_after=None, accepted_before=None, category=None, long_seqtype=None, request_lane=None, share_status=None, short_seqtype=None, size_analysis_done=None, status=None):
     self.accepted_after = accepted_after
     self.accepted_before = accepted_before
+    self.category = category
     self.long_seqtype = long_seqtype
     self.request_lane = request_lane
     self.share_status = share_status
     self.short_seqtype = short_seqtype
+    self.size_analysis_done = size_analysis_done
     self.status = status
 
 class RequestLaneSorts:
@@ -296,17 +300,19 @@ class SampleSorts:
 
 
 class ScientistFilters:
-  def __init__(self, email=None, firstname=None, fullname=None, group=None, last_login_after=None, last_login_before=None, lastname=None, login_ok_max=None, login_ok_min=None, primary_group_name=None):
+  def __init__(self, email=None, firstname=None, fullname=None, group=None, last_change_since=None, last_login_after=None, last_login_before=None, lastname=None, login_ok_max=None, login_ok_min=None, primary_group_name=None, username=None):
     self.email = email
     self.firstname = firstname
     self.fullname = fullname
     self.group = group
+    self.last_change_since = last_change_since
     self.last_login_after = last_login_after
     self.last_login_before = last_login_before
     self.lastname = lastname
     self.login_ok_max = login_ok_max
     self.login_ok_min = login_ok_min
     self.primary_group_name = primary_group_name
+    self.username = username
 
 class ScientistSorts:
   def __init__(self, fullname=None, group=None, primary_group_name=None):
@@ -326,11 +332,15 @@ class SequencedSampleFilters:
     self.status = status
 
 class SequencedSampleSorts:
-  pass
+  def __init__(self, request_id=None, sample_id=None, sequencing_date=None):
+    self.request_id = request_id
+    self.sample_id = sample_id
+    self.sequencing_date = sequencing_date
 
 
 class SuperMultiFilters:
-  pass
+  def __init__(self, short_seqtype=None):
+    self.short_seqtype = short_seqtype
 
 class SuperMultiSorts:
   pass
