@@ -25,10 +25,11 @@ class DataEntrySorts:
 
 
 class GroupFilters:
-  def __init__(self, billing_type=None, email=None, institute=None, name=None):
+  def __init__(self, billing_type=None, email=None, institute=None, last_change_since=None, name=None):
     self.billing_type = billing_type
     self.email = email
     self.institute = institute
+    self.last_change_since = last_change_since
     self.name = name
 
 class GroupSorts:
