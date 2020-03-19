@@ -25,7 +25,8 @@ class DataEntrySorts:
 
 
 class GroupFilters:
-  def __init__(self, billing_type=None, email=None, institute=None, last_change_since=None, name=None):
+  def __init__(self, active=None, billing_type=None, email=None, institute=None, last_change_since=None, name=None):
+    self.active = active
     self.billing_type = billing_type
     self.email = email
     self.institute = institute
@@ -301,7 +302,8 @@ class SampleSorts:
 
 
 class ScientistFilters:
-  def __init__(self, email=None, firstname=None, fullname=None, group=None, last_change_since=None, last_login_after=None, last_login_before=None, lastname=None, login_ok_max=None, login_ok_min=None, primary_group_name=None, username=None):
+  def __init__(self, active=None, email=None, firstname=None, fullname=None, group=None, last_change_since=None, last_login_after=None, last_login_before=None, lastname=None, login_ok_max=None, login_ok_min=None, primary_group_name=None, username=None):
+    self.active = active
     self.email = email
     self.firstname = firstname
     self.fullname = fullname
