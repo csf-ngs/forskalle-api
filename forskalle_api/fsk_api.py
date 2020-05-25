@@ -112,7 +112,13 @@ class FskApi:
   
   def get_group(self, id):
     return self.get("/api/groups/{id}".format(id=id))
-  
+ 
+  def list_runs_illumina(self, params=None):
+    return self.get("/api/runs/illumina", params=params)
+
+  def get_run_illumina(self, id):
+    return self.get("/api/runs/illumina/{id}".format(id=id))
+ 
   def generate_passwords(self):
     return self.get("/api/scientists/generate_passwords")
 

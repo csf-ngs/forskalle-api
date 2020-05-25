@@ -34,4 +34,16 @@ fsk_api = FskApi()
 sample_json = fsk_api.get_sample(54321)
 ```
 
+```
+from forskalle_api import FskApi
+from forskalle_api.auto.queryparams import IlluminaRunFilters
+from forskalle_api.fsk_query import FskQuery
+
+fsk_api = FskApi()
+irf = IlluminaRunFilters(sequenced_after="2020-05-01")
+q = FskQuery(filters=irf)
+runs = fsk_api.get_runs_illumina(q)
+```
+
+
 There is no API-doc or similar, but we all love reading python source code!
