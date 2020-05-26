@@ -141,7 +141,6 @@ class FskApi:
     (path, link, size, md5) = self._prepare_datafile(path, link, size, md5)
     
     cell_base = 'smrtcells' if where == 'pacbio' else 'flowcell_runs'
-    path = path.replace('/scratch/', '/clustertmp/')
     return self.post("/api/runs/{where}/{cell_base}/{unique_id}".format(where=where, cell_base=cell_base, unique_id=unique_id), {
       'datafiles_path': path,
       'datafiles_url': link,
