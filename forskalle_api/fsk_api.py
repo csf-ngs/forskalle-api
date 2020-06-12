@@ -7,7 +7,7 @@ import datetime
 from uuid import uuid4
 
 class FskError(Exception):
-  def __init__(self, status, code, detail, doclink=None, line=None, **kwargs):
+  def __init__(self, code, detail, status=None, doclink=None, line=None, **kwargs):
     self.status = status
     self.code = code
     self.detail = detail
@@ -78,6 +78,15 @@ class FskApi:
     r = requests.post(self.base+route, headers=self.make_headers(), data=data, files=files)
     if r.status_code != requests.codes.ok:
       self.handle_error(r)
+    return r.json()
+
+  def post_csv(self, route, files, data=None):
+    headers = self.make_headers()
+    headers['Accept']='text/csv'
+    r = requests.post(self.base+route, headers=headers, data=data, files=files)
+    if r.status_code != requests.codes.ok:
+      self.handle_error(r)
+    return r.text
 
   def put(self, route, data):
     r = requests.put(self.base+route, headers=self.make_headers(), json=data)
