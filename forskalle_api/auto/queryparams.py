@@ -63,10 +63,11 @@ class IlluminaRunSorts:
 
 
 class MultiplexFilters:
-  def __init__(self, available_samples=None, description=None, group=None, platform=None, received_after=None, received_before=None, sample_antibody=None, sample_celltype=None, sample_description=None, sample_exptype=None, sample_genotype=None, sample_organism=None, sample_tissue_type=None, sample_treatment=None, scientist=None):
+  def __init__(self, available_samples=None, description=None, group=None, id_list=None, platform=None, received_after=None, received_before=None, sample_antibody=None, sample_celltype=None, sample_description=None, sample_exptype=None, sample_genotype=None, sample_organism=None, sample_tissue_type=None, sample_treatment=None, scientist=None):
     self.available_samples = available_samples
     self.description = description
     self.group = group
+    self.id_list = id_list
     self.platform = platform
     self.received_after = received_after
     self.received_before = received_before
@@ -165,7 +166,7 @@ class ProjectSorts:
 
 
 class RequestFilters:
-  def __init__(self, accepted_after=None, accepted_before=None, align=None, completed_after=None, completed_before=None, cost_assignment=None, group=None, long_seqtype=None, project_name=None, quarter=None, request_lane_status=None, sample_celltype=None, sample_comments=None, sample_description=None, sample_exptype=None, sample_genotype=None, sample_organism=None, sample_preparation_kit=None, sample_preparation_type=None, sample_primer=None, sample_tissue_type=None, scientist=None, short_seqtype=None, status=None, submitted_after=None, submitted_before=None):
+  def __init__(self, accepted_after=None, accepted_before=None, align=None, completed_after=None, completed_before=None, cost_assignment=None, group=None, id_list=None, long_seqtype=None, project_name=None, quarter=None, request_lane_status=None, sample_celltype=None, sample_comments=None, sample_description=None, sample_exptype=None, sample_genotype=None, sample_organism=None, sample_preparation_kit=None, sample_preparation_type=None, sample_primer=None, sample_tissue_type=None, scientist=None, short_seqtype=None, status=None, submitted_after=None, submitted_before=None):
     self.accepted_after = accepted_after
     self.accepted_before = accepted_before
     self.align = align
@@ -173,6 +174,7 @@ class RequestFilters:
     self.completed_before = completed_before
     self.cost_assignment = cost_assignment
     self.group = group
+    self.id_list = id_list
     self.long_seqtype = long_seqtype
     self.project_name = project_name
     self.quarter = quarter
@@ -264,7 +266,7 @@ class RunSorts:
 
 
 class SampleFilters:
-  def __init__(self, antibody=None, available=None, celltype=None, changed_since=None, comments=None, description=None, exptype=None, genotype=None, group=None, id_from=None, id_to=None, multi_id=None, organism=None, platform=None, preparation_kit=None, preparation_type=None, ready_after=None, ready_before=None, received_after=None, received_before=None, request_id=None, request_status=None, scientist=None, status=None, tissue_type=None, treatment=None):
+  def __init__(self, antibody=None, available=None, celltype=None, changed_since=None, comments=None, description=None, exptype=None, genotype=None, group=None, id_from=None, id_list=None, id_to=None, multi_id=None, organism=None, platform=None, preparation_kit=None, preparation_type=None, ready_after=None, ready_before=None, received_after=None, received_before=None, request_id=None, request_status=None, scientist=None, status=None, tissue_type=None, treatment=None):
     self.antibody = antibody
     self.available = available
     self.celltype = celltype
@@ -275,6 +277,7 @@ class SampleFilters:
     self.genotype = genotype
     self.group = group
     self.id_from = id_from
+    self.id_list = id_list
     self.id_to = id_to
     self.multi_id = multi_id
     self.organism = organism
@@ -347,20 +350,4 @@ class SuperMultiFilters:
 
 class SuperMultiSorts:
   pass
-
-
-class WpTicketFilters:
-  def __init__(self, assigned_agent=None, category=None, raised_by=None, status=None, subject=None, updated_after=None, updated_before=None):
-    self.assigned_agent = assigned_agent
-    self.category = category
-    self.raised_by = raised_by
-    self.status = status
-    self.subject = subject
-    self.updated_after = updated_after
-    self.updated_before = updated_before
-
-class WpTicketSorts:
-  def __init__(self, id=None, updated=None):
-    self.id = id
-    self.updated = updated
 
