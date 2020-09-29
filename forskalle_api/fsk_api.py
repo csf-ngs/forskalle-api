@@ -2,7 +2,6 @@ import requests
 import yaml
 import os
 import os.path
-import yaml
 import datetime
 from uuid import uuid4
 
