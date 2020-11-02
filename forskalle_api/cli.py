@@ -61,6 +61,12 @@ def publish_pacbio_download(unique_id, path, link=None, size=None, md5=None):
   ret = FskApi().publish_smrtcell_download(unique_id, path, link=link, size=size, md5=md5)
   print(json.dumps(ret, indent=2))
 
+@cli.command(short_help='import a pacbio run from subreadset.xml')
+@click.argument('path')
+def import_subreadset(path):
+  ret = FskApi().import_subreadset(path)
+  print(json.dumps(ret, indent=2))
+
 @cli.command(short_help='register nanopore report URL in Forskalle (admin only)')
 @click.argument('unique_id')
 @click.argument('url')
