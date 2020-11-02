@@ -64,7 +64,9 @@ def publish_pacbio_download(unique_id, path, link=None, size=None, md5=None):
 @cli.command(short_help='import a pacbio run from subreadset.xml')
 @click.argument('path')
 def import_subreadset(path):
-  ret = FskApi().import_subreadset(path)
+  with open(path, 'r') as fh:
+    subreadset = fh.read()
+  ret = FskApi().import_subreadset(subreadset)
   print(json.dumps(ret, indent=2))
 
 @cli.command(short_help='register nanopore report URL in Forskalle (admin only)')
