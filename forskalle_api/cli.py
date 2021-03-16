@@ -1,11 +1,14 @@
-from __future__ import print_function
-
 import click
+import click_log
 import json
+import logging
 from forskalle_api.fsk_api import FskApi
 
 from forskalle_api.fsk_query import FskPagedQuery, FskQuery
 from forskalle_api.auto.queryparams import SampleFilters, SequencedSampleFilters, MultiplexFilters, RequestFilters
+
+logger = logging.getLogger(__name__)
+click_log.basic_config(logger)
 
 def make_query(filters, limit, page):
   if page != 0:
@@ -16,8 +19,8 @@ def make_query(filters, limit, page):
 
 
 @click.group()
-@click.option('--debug/--no-debug', default=False)
-def cli(debug):
+@click_log.simple_verbosity_option(logger)
+def cli():
     """Fsk3 CLI - sequencing metadata made easy."""
     pass
 
@@ -154,6 +157,43 @@ def get_sample_sequencing(sample_id, csv=False):
   else:
     print(json.dumps(ret, indent=2))
 
+@cli.command(short_help='update sequencing run status for a sample')
+@click.argument('sample_id')
+@click.option('--status', '-s', type=click.Choice(['Ok', 'Repeat', 'Failed'], case_sensitive=False), default="Ok")
+@click.option('--vendor_id', help='Flowcell ID when there are multiple runs for a sample')
+def set_sequencing_status(sample_id, status='Ok', vendor_id=None):
+  api = FskApi()
+  seqsamps = api.get_sample_sequencing_runs(sample_id)
+  runs = {}
+  for seqsamp in seqsamps:
+    v_id = seqsamp['run_unit']['run']['vendor_id']
+    if not v_id in runs:
+      runs[v_id] = seqsamp['run_unit']['run']
+      runs[v_id]['seqsamps']=[]
+    runs[v_id]['seqsamps'].append(seqsamp)
+  
+  if len(runs) > 1 and not vendor_id:
+    logger.info("Multiple runs found:")
+    for vendor_id in runs.keys():
+      logger.info(f"- {vendor_id}")
+    raise click.ClickException("Please to tell me which run to fiddle with (hint: --vendor_id)")
+  run = runs.popitem()[1] if not vendor_id else runs.get(vendor_id)
+  if not run:
+    raise click.ClickException(f"Run {vendor_id} not found!")
+  
+  unit_name = 'lanes' if run['platform'] == 'Illumina' else 'smrtcells' if run['platform'] == 'Pacbio' else 'ont_flowcell_runs' if run['platform'] == 'ONT' else None
+  db_run = api.get(f"/api/runs/{run['platform'].lower()}/{run['vendor_id']}")
+  for db_unit in db_run[unit_name]:
+    for seqsamp in run['seqsamps']:
+      if seqsamp['unit_id'] == db_unit['unit_id']:
+        for db_ss in db_unit['sequenced_samples']:
+          if db_ss['reqsamp_id'] == seqsamp['reqsamp_id']:
+            logger.debug(f"seqsamp {db_ss['id']} found on unit {db_unit['unit_id']}, setting status to {status}")
+            db_ss['status']=status
+  ret = api.post(f"/api/runs/{run['platform'].lower()}/{run['vendor_id']}", db_run)
+  logger.info(f"Run {ret['vendor_id']} updated, new status: {ret['status']}")
+
+
 
 @cli.command(short_help='list multiplexes')
 @click.option('--scientist', help="Scientist name, only useful with admin query")
@@ -193,7 +233,7 @@ def list_requests(scientist, group, limit, page, csv, admin):
   else:
     print(json.dumps(ret, indent=2))
 
-@cli.command(short_help='get request metadata')
+@cli.command(short_help='get request metadata (DEPRECATED, use `request [id] get` instead')
 @click.argument('request_id')
 def get_request(request_id):
   if request_id.startswith('R'):
@@ -216,6 +256,41 @@ def post_datafile(path, url=None, size=None, md5=None, filetype='Misc'):
 def delete_datafile(path):
   ret = FskApi().delete_datafile(path)
   if ret['msg'] == 'Deleted.':
-    print("Deleted.")
+    logger.info("Deleted.")
   else:
-    print("Weird?")
+    logger.warning("Weird?")
+  
+
+@cli.group(short_help='request related commands')
+@click.argument('id')
+@click.pass_context
+def request(ctx, id):
+  if id.startswith('R'):
+    id = id[1:]
+  ctx.ensure_object(dict)
+  ctx.obj['api']=FskApi()
+  ctx.obj['request']=ctx.obj['api'].get_request(id)
+
+@request.command(short_help='get metadata', name='get')
+@click.option('--out', '-o', type=click.File("w"), default='-')
+@click.pass_context
+def get_request_data(ctx, out):
+  out.write(json.dumps(ctx.obj['request'], indent=2))
+
+@request.command(short_help='update request', name='update')
+@click.option('--json', '-j', 'input',  type=click.File("r"), default='-')
+@click.pass_context
+def set_request_data(ctx, input):
+  update=json.load(input)
+  ret = ctx.obj['api'].post(f"/api/requests/{ctx.obj['request']['id']}", update)
+  logger.info(f"Update request {ret['id']}")
+
+@request.command(short_help='set status')
+@click.argument('status', type=click.Choice(['Completed', 'Aborted', 'Accepted'], case_sensitive=False))
+@click.pass_context
+def set_status(ctx, status):
+  ctx.obj['request']['status']=status
+  ret = ctx.obj['api'].post(f"/api/requests/{ctx.obj['request']['id']}", ctx.obj['request'])
+  logger.info(f"Updated request {ret['id']}, new status {ret['status']}")
+  for rl in ret['request_lanes']:
+    logger.info(f" lane {rl['num']} status {rl['status']}")

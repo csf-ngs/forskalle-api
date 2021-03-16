@@ -13,7 +13,7 @@ with open('forskalle_api/__init__.py', 'r') as f:
 with open('README.md', 'r', encoding='utf-8') as f:
     readme = f.read()
 
-REQUIRES = ['click', 'requests', 'PyYAML']
+REQUIRES = ['click', 'requests', 'PyYAML', 'click_log']
 
 setup(
     name='forskalle-api',

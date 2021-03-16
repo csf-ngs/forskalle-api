@@ -25,6 +25,26 @@ Point it at your favorite Forskalle instance either by
 
 Try `fsk-cli --help` for some hints!
 
+#### Examples
+
+Set all sequenced samples of a multiplex to Ok:
+
+```bash
+fsk-cli get-multi M4711 | jq '.multiplex_samples[].sample_id' | \
+  while read sample_id; do 
+    fsk-cli set-sequencing-status $sample_id --status Ok
+  done
+```
+
+In place editing with jq and updating:
+
+```bash
+# update all request lanes to status Ready
+fsk-cli request R4711 get | \
+  jq '.request_lanes[].status="Ready"' | \
+  fsk-cli request R4711 update
+```
+
 ### Library
 
 ```
