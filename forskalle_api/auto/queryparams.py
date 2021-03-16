@@ -62,6 +62,27 @@ class IlluminaRunSorts:
     self.vendor_id = vendor_id
 
 
+class InventoryChangeFilters:
+  def __init__(self, comment=None, item=None):
+    self.comment = comment
+    self.item = item
+
+class InventoryChangeSorts:
+  pass
+
+
+class InventoryItemFilters:
+  def __init__(self, active=None, description=None, pricing_item_name=None, threshold=None, type=None):
+    self.active = active
+    self.description = description
+    self.pricing_item_name = pricing_item_name
+    self.threshold = threshold
+    self.type = type
+
+class InventoryItemSorts:
+  pass
+
+
 class MultiplexFilters:
   def __init__(self, available_samples=None, description=None, group=None, id_list=None, platform=None, received_after=None, received_before=None, sample_antibody=None, sample_celltype=None, sample_description=None, sample_exptype=None, sample_genotype=None, sample_organism=None, sample_tissue_type=None, sample_treatment=None, scientist=None):
     self.available_samples = available_samples
@@ -166,7 +187,7 @@ class ProjectSorts:
 
 
 class RequestFilters:
-  def __init__(self, accepted_after=None, accepted_before=None, align=None, completed_after=None, completed_before=None, cost_assignment=None, group=None, id_list=None, long_seqtype=None, project_name=None, quarter=None, request_lane_status=None, sample_celltype=None, sample_comments=None, sample_description=None, sample_exptype=None, sample_genotype=None, sample_organism=None, sample_preparation_kit=None, sample_preparation_type=None, sample_primer=None, sample_tissue_type=None, scientist=None, short_seqtype=None, status=None, submitted_after=None, submitted_before=None):
+  def __init__(self, accepted_after=None, accepted_before=None, align=None, completed_after=None, completed_before=None, cost_assignment=None, group=None, id_list=None, long_seqtype=None, no_shadow=None, project_name=None, quarter=None, request_lane_status=None, sample_celltype=None, sample_comments=None, sample_description=None, sample_exptype=None, sample_genotype=None, sample_organism=None, sample_preparation_kit=None, sample_preparation_type=None, sample_primer=None, sample_tissue_type=None, scientist=None, short_seqtype=None, size_analysis_done=None, status=None, submitted_after=None, submitted_before=None):
     self.accepted_after = accepted_after
     self.accepted_before = accepted_before
     self.align = align
@@ -176,6 +197,7 @@ class RequestFilters:
     self.group = group
     self.id_list = id_list
     self.long_seqtype = long_seqtype
+    self.no_shadow = no_shadow
     self.project_name = project_name
     self.quarter = quarter
     self.request_lane_status = request_lane_status
@@ -191,6 +213,7 @@ class RequestFilters:
     self.sample_tissue_type = sample_tissue_type
     self.scientist = scientist
     self.short_seqtype = short_seqtype
+    self.size_analysis_done = size_analysis_done
     self.status = status
     self.submitted_after = submitted_after
     self.submitted_before = submitted_before
@@ -221,11 +244,12 @@ class RequestDraftSorts:
 
 
 class RequestLaneFilters:
-  def __init__(self, accepted_after=None, accepted_before=None, category=None, long_seqtype=None, request_lane=None, share_status=None, short_seqtype=None, size_analysis_done=None, status=None):
+  def __init__(self, accepted_after=None, accepted_before=None, category=None, long_seqtype=None, no_shadow=None, request_lane=None, share_status=None, short_seqtype=None, size_analysis_done=None, status=None):
     self.accepted_after = accepted_after
     self.accepted_before = accepted_before
     self.category = category
     self.long_seqtype = long_seqtype
+    self.no_shadow = no_shadow
     self.request_lane = request_lane
     self.share_status = share_status
     self.short_seqtype = short_seqtype
@@ -266,7 +290,7 @@ class RunSorts:
 
 
 class SampleFilters:
-  def __init__(self, antibody=None, available=None, celltype=None, changed_since=None, comments=None, description=None, exptype=None, genotype=None, group=None, id_from=None, id_list=None, id_to=None, multi_id=None, organism=None, platform=None, preparation_kit=None, preparation_type=None, ready_after=None, ready_before=None, received_after=None, received_before=None, request_id=None, request_status=None, scientist=None, status=None, tissue_type=None, treatment=None):
+  def __init__(self, antibody=None, available=None, celltype=None, changed_since=None, comments=None, description=None, exptype=None, external_link=None, genotype=None, group=None, id_from=None, id_list=None, id_to=None, multi_id=None, organism=None, platform=None, preparation_kit=None, preparation_type=None, ready_after=None, ready_before=None, received_after=None, received_before=None, request_id=None, request_status=None, scientist=None, status=None, tissue_type=None, treatment=None):
     self.antibody = antibody
     self.available = available
     self.celltype = celltype
@@ -274,6 +298,7 @@ class SampleFilters:
     self.comments = comments
     self.description = description
     self.exptype = exptype
+    self.external_link = external_link
     self.genotype = genotype
     self.group = group
     self.id_from = id_from
@@ -302,6 +327,17 @@ class SampleSorts:
     self.ready = ready
     self.received = received
     self.scientist = scientist
+
+
+class SampleListFilters:
+  def __init__(self, title=None, user=None):
+    self.title = title
+    self.user = user
+
+class SampleListSorts:
+  def __init__(self, created=None, title=None):
+    self.created = created
+    self.title = title
 
 
 class ScientistFilters:
