@@ -1,0 +1,5 @@
+build: singularity build forskalle-cli.sif Singularity
+name: forskalle-cli
+registry:
+  name: infra/forskalle-cli
+  tag: latest
