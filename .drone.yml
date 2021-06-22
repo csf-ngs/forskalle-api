@@ -1,10 +1,10 @@
 ---
-name: pappskalle-cli
+name: forskalle-cli
 kind: pipeline
 
 steps:
 - name: testhase
-  image: python:3.7
+  image: python:3.8
   commands:
   - pip3 install nose2
   - pip3 install -e .
