@@ -46,9 +46,9 @@ setup(
     ],
 
     install_requires=REQUIRES,
-    tests_require=['coverage', 'pytest'],
-
-    packages=find_packages(),
+    tests_require=['coverage', 'nose2'],
+    packages=find_packages(include=['forskalle_api']),
+    test_suite='tests',
     entry_points={
         'console_scripts': {
             'fsk-cli = forskalle_api.cli:cli',
