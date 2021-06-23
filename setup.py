@@ -47,7 +47,7 @@ setup(
 
     install_requires=REQUIRES,
     tests_require=['coverage', 'nose2'],
-    packages=find_packages(include=['forskalle_api']),
+    packages=find_packages(include=['forskalle_api', 'forskalle_api.*']),
     test_suite='tests',
     entry_points={
         'console_scripts': {
