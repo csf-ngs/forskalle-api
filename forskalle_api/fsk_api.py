@@ -34,9 +34,9 @@ class FskApi:
       cfg = {}
 
     if not base:
-      base=cfg['fsk_api_base']
+      base=cfg.get('fsk_api_base')
     if not key:
-      key=cfg['fsk_api_key']
+      key=cfg.get('fsk_api_key')
     if not base or not key:
       raise Exception("Please configure FSK_API_BASE and FSK_API_KEY!")
     if base.endswith('/'):
