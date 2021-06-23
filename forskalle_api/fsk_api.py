@@ -1,3 +1,4 @@
+import typing
 import requests
 import yaml
 import os
@@ -18,24 +19,32 @@ class FskError(Exception):
     return "FSK-ERROR: {status} {code} {detail}".format(status=self.status, code=self.code, detail=self.detail)
 
 class FskApi:
-  default_file_name = '~/.fsk_api.yml'
+  config_file = '~/.fsk_api.yml'
 
-  def __init__(self, base=os.environ.get('FSK_API_BASE', None), key=os.environ.get('FSK_API_KEY', None), api_conf=default_file_name):
-    if not base or not key:
-      with open(os.path.expanduser(api_conf), 'rb') as yml:
+  def __init__(self, base=None, key=None):
+    if not base:
+      base = os.environ.get('FSK_API_BASE')
+    if not key:
+      key = os.environ.get('FSK_API_KEY')
+    self.config_file = os.environ.get('FSK_API_CFG', self.config_file)
+    try:
+      with open(os.path.expanduser(self.config_file), 'r') as yml:
         cfg = yaml.load(yml, Loader=yaml.SafeLoader)
-      if not base:
-        base=cfg['fsk_api_base']
-      if not key:
-        key=cfg['fsk_api_key']
+    except FileNotFoundError:
+      cfg = {}
+
+    if not base:
+      base=cfg['fsk_api_base']
+    if not key:
+      key=cfg['fsk_api_key']
     if not base or not key:
       raise Exception("Please configure FSK_API_BASE and FSK_API_KEY!")
     if base.endswith('/'):
       base = base[:-1]
 
-    self.base=base
-    self.key=key
-    self.username=None
+    self.base: str = base
+    self.key: str = key
+    self.username: typing.Optional[str] = None
 
   def handle_error(self, r):
     try:
