@@ -135,34 +135,39 @@ class FskApi:
 
   def get_run_illumina(self, id):
     return self.get("/api/runs/illumina/{id}".format(id=id))
+  
+  def get_smrtcell_info(self, run: str, well: str):
+    return self.get(f"/api/runs/pacbio/{run}/{well}")
  
   def generate_passwords(self):
     return self.get("/api/scientists/generate_passwords")
 
-  def _prepare_datafile(self, path, link=None, size=None, md5=None):
+  def _prepare_datafile(self, path, link=None, size=None, hash=None):
     path = os.path.abspath(path)
     if not link:
       uuid = str(uuid4())[0:8]
       link = uuid + '_'+os.path.basename(path)
     if not size:
       size = os.path.getsize(path)
-    if not md5:
+    if not hash:
       if not os.path.exists(path + '.md5'):
         raise Exception("md5 not provided and {path}.md5 not found.".format(path=path))
       with open(path + '.md5') as md5fh:
-        md5=md5fh.readline().strip().split()[0]
+        hash="md5."+md5fh.readline().strip().split()[0]
     
-    return (path, link, size, md5)
+    return (path, link, size, hash)
 
-  def _publish_download(self, where, unique_id, path, link=None, size=None, md5=None):
-    (path, link, size, md5) = self._prepare_datafile(path, link, size, md5)
+  def _publish_download(self, where, unique_id, path, link=None, size=None, hash=None, hinkskalle=None):
+    if path:
+      (path, link, size, hash) = self._prepare_datafile(path, link, size, hash)
     
     cell_base = 'smrtcells' if where == 'pacbio' else 'flowcell_runs'
-    return self.post("/api/runs/{where}/{cell_base}/{unique_id}".format(where=where, cell_base=cell_base, unique_id=unique_id), {
+    return self.post(f"/api/runs/{where}/{cell_base}/{unique_id}", {
       'datafiles_path': path,
       'datafiles_url': link,
       'datafiles_size': size,
-      'datafiles_md5': md5
+      'datafiles_link': hinkskalle,
+      'datafiles_hash': hash,
     })
   
   def publish_smrtcell_report(self, unique_id, report_url):
