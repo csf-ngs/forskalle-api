@@ -57,7 +57,7 @@ def post_pacbio_report_url(unique_id, url):
 @cli.command(short_help='register smrtcell data download link in Forskalle (admin only')
 @click.argument('unique_id')
 @click.argument('path')
-@click.option('--link', '-l', help='explicit link name (last part of URL)')
+@click.option('--link', '-l', help='explicit link name (full URL)')
 @click.option('--size', '-s', help='explicit file size')
 @click.option('--md5', '-m', help='explicit md5 sum (taken from [path].md5 otherwise)')
 def publish_pacbio_download(unique_id, path, link=None, size=None, md5=None):
@@ -82,7 +82,7 @@ def post_nanopore_report_url(unique_id, url):
 @cli.command(short_help='register nanopore data download link in Forskalle (admin only')
 @click.argument('unique_id')
 @click.argument('path')
-@click.option('--link', '-l', help='explicit link name (last part of URL)')
+@click.option('--link', '-l', help='explicit link name (full URL)')
 @click.option('--size', '-s', help='explicit file size')
 @click.option('--md5', '-m', help='explicit md5 sum (taken from [path].md5 otherwise)')
 def publish_nanopore_download(unique_id, path, link=None, size=None, md5=None):
