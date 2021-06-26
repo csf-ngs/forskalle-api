@@ -2,6 +2,7 @@
 
 (wait for fsk update)
 
+- *feature* import ont metadata
 - *feature* generic result file publishing for nanopore + pacbio runs (can publish absolute urls independent of seqmate) 
 - rename md5 to hash for datafiles
 
