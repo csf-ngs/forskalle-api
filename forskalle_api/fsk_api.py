@@ -138,6 +138,9 @@ class FskApi:
   
   def get_smrtcell_info(self, run: str, well: str):
     return self.get(f"/api/runs/pacbio/{run}/{well}")
+  
+  def get_ont_flowcell_info(self, run: str):
+    return self.get(f"/api/runs/ont/flowcell_runs/{run}")
  
   def generate_passwords(self):
     return self.get("/api/scientists/generate_passwords")

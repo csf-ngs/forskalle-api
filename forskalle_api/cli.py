@@ -72,6 +72,14 @@ def import_subreadset(path):
   ret = FskApi().import_subreadset(subreadset)
   print(json.dumps(ret, indent=2))
 
+@cli.command(short_help='import a nanopore run from metadata.json')
+@click.argument('path')
+def import_ont_meta(path):
+  with open(path, 'r') as fh:
+    meta = json.load(fh)
+  ret = FskApi().import_nanopore_run(meta)
+  print(json.dumps(ret, indent=2))
+
 @cli.command(short_help='register nanopore report URL in Forskalle (admin only)')
 @click.argument('unique_id')
 @click.argument('url')
