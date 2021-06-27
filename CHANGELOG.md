@@ -1,6 +1,4 @@
-# v0.1.0 ()
-
-(wait for fsk update)
+# v0.1.0 (2021-06-27)
 
 - *feature* import ont metadata
 - *feature* generic result file publishing for nanopore + pacbio runs (can publish absolute urls independent of seqmate) 
