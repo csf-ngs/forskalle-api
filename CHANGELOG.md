@@ -5,6 +5,7 @@
 - *feature* import ont metadata
 - *feature* generic result file publishing for nanopore + pacbio runs (can publish absolute urls independent of seqmate) 
 - rename md5 to hash for datafiles
+- `post_nanopore_basecalls` looked unused
 
 # v0.0.12 (2021-06-22)
 
