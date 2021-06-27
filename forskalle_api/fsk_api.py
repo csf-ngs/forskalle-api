@@ -196,19 +196,6 @@ class FskApi:
   def import_nanopore_run(self, metadata):
     return self.post("/api/runs/ont/flowcell_runs/import", metadata)
 
-  def post_nanopore_basecalls(self, run_id, path, basecalls, basecaller, basecalled=None, copied=None):
-    if not basecalled:
-      basecalled=datetime.now().isoformat()
-    if not copied:
-      copied = datetime.now().isoformat()
-    
-    return self.post("/api/runs/ont/flowcell_runs/{run_id}".format(run_id=run_id), {
-      'basecalled': basecalled.replace('Z', '+00:00'),
-      'basecaller': basecaller,
-      'fastq_path': path,
-      'copied': copied.replace('Z', '+00:00')
-    })
-
   def publish_nanopore_download(self, run_id, path, **kwargs):
     return self._publish_download(where='ont', unique_id=run_id, path=path, **kwargs)
 
