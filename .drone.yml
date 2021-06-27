@@ -3,16 +3,16 @@ name: forskalle-cli
 kind: pipeline
 
 steps:
+- name: fetch
+  image: drone/git
+  commands:
+    - git fetch --tags
 - name: testhase
   image: python:3.8
   commands:
   - pip3 install nose2
   - pip3 install -e .
   - nose2
-- name: fetch
-  image: drone/git
-  commands:
-    - git fetch --tags
 - name: bauhaus
   image: docker.ngs.vbcf.ac.at/singularity-builder
   privileged: true
