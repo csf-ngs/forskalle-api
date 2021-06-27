@@ -2,6 +2,7 @@ import click
 import click_log
 import json
 import logging
+import shutil
 from forskalle_api.fsk_api import FskApi
 
 from forskalle_api.fsk_query import FskPagedQuery, FskQuery
@@ -74,10 +75,19 @@ def import_subreadset(path):
 
 @cli.command(short_help='import a nanopore run from metadata.json')
 @click.argument('path')
-def import_ont_meta(path):
+@click.option('--update-meta/--no-update-meta', help='write back fsk_vendor_id to metadata.json', default=True)
+def import_ont_meta(path, update_meta):
   with open(path, 'r') as fh:
     meta = json.load(fh)
   ret = FskApi().import_nanopore_run(meta)
+  if update_meta:
+    meta['fsk_vendor_id']=ret['vendor_id']
+    for run in ret['ont_flowcell_runs']:
+      if run['unique_id']==meta['run_id']:
+        meta['fsk_unit_id']=run['unit_id']
+    with open(f"{path}.new", 'w') as fh:
+      json.dump(meta, fh, sort_keys=True)
+      shutil.move(f"{path}.new", path)
   print(json.dumps(ret, indent=2))
 
 @cli.command(short_help='register nanopore report URL in Forskalle (admin only)')
