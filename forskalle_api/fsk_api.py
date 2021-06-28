@@ -6,6 +6,9 @@ import os.path
 import datetime
 from uuid import uuid4
 
+import logging
+logger = logging.getLogger()
+
 class FskError(Exception):
   def __init__(self, code, detail, status=None, doclink=None, line=None, **kwargs):
     self.status = status
@@ -274,13 +277,16 @@ class FskApi:
     else:
       return self.get(base, params=params)
   
-  def post_datafile(self, path, link=None, size=None, md5=None, filetype='Misc'):
-    (path, link, size, md5) = self._prepare_datafile(path, link, size, md5)
+  def post_datafile(self, path, link=None, size=None, md5=None, hash=None, filetype='Misc'):
+    if md5:
+      logger.warn(f"using deprecated md5 parameter, should be hash")
+      hash = md5
+    (path, link, size, hash) = self._prepare_datafile(path, link, size, hash)
     return self.post('/api/datafiles', {
       'path': path,
       'url': link,
       'size': size,
-      'md5': md5,
+      'hash': hash,
       'filetype': filetype,
     })
   

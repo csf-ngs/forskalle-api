@@ -60,9 +60,13 @@ def post_pacbio_report_url(unique_id, url):
 @click.argument('path')
 @click.option('--link', '-l', help='explicit link name (full URL)')
 @click.option('--size', '-s', help='explicit file size')
-@click.option('--md5', '-m', help='explicit md5 sum (taken from [path].md5 otherwise)')
-def publish_pacbio_download(unique_id, path, link=None, size=None, md5=None):
-  ret = FskApi().publish_smrtcell_download(unique_id, path, link=link, size=size, md5=md5)
+@click.option('--md5', '-m', help='DEPRECATED, use hash instead -- explicit md5 sum (taken from [path].md5 otherwise)')
+@click.option('--hash', '-h', help='explicit md5 sum (taken from [path].md5 otherwise)')
+def publish_pacbio_download(unique_id, path, link, size, md5, hash):
+  if md5:
+    logger.warn(f"The --hash paramter is the new --md5 parameter")
+    hash=f"md5.{md5}"
+  ret = FskApi().publish_smrtcell_download(unique_id, path, link=link, size=size, hash=hash)
   print(json.dumps(ret, indent=2))
 
 @cli.command(short_help='import a pacbio run from subreadset.xml')
@@ -102,9 +106,13 @@ def post_nanopore_report_url(unique_id, url):
 @click.argument('path')
 @click.option('--link', '-l', help='explicit link name (full URL)')
 @click.option('--size', '-s', help='explicit file size')
-@click.option('--md5', '-m', help='explicit md5 sum (taken from [path].md5 otherwise)')
-def publish_nanopore_download(unique_id, path, link=None, size=None, md5=None):
-  ret = FskApi().publish_nanopore_download(unique_id, path, link=link, size=size, md5=md5)
+@click.option('--md5', '-m', help='DEPRECATED, use hash instead -- explicit md5 sum (taken from [path].md5 otherwise)')
+@click.option('--hash', '-h', help='explicit md5 sum (taken from [path].md5 otherwise)')
+def publish_nanopore_download(unique_id, path, link=None, size=None, md5=None, hash=None):
+  if md5:
+    logger.warn(f"The --hash paramter is the new --md5 parameter")
+    hash=f"md5.{md5}"
+  ret = FskApi().publish_nanopore_download(unique_id, path, link=link, size=size, hash=hash)
   print(json.dumps(ret, indent=2))
 
 
@@ -263,10 +271,14 @@ def get_request(request_id):
 @click.argument('path')
 @click.option('--url', '-u', help="Override automatically generated URL")
 @click.option('--size', '-s', help="Override automatically determined size")
-@click.option('--md5', '-m', help="MD5 sum, read from [path].md5 if not specified")
+@click.option('--md5', '-m', help='DEPRECATED, use hash instead -- explicit md5 sum (taken from [path].md5 otherwise)')
+@click.option('--hash', '-h', help='explicit md5 sum (taken from [path].md5 otherwise)')
 @click.option('--filetype', '-f', help="Filetype", default="Misc")
-def post_datafile(path, url=None, size=None, md5=None, filetype='Misc'):
-  ret = FskApi().post_datafile(path, url, size, md5, filetype)
+def post_datafile(path, url=None, size=None, md5=None, filetype='Misc', hash=None):
+  if md5:
+    logger.warn(f"The --hash paramter is the new --md5 parameter")
+    hash=f"md5.{md5}"
+  ret = FskApi().post_datafile(path=path, link=url, size=size, hash=hash, filetype=filetype)
   print(json.dumps(ret, indent=2))
 
 @cli.command(short_help='delete datafile')

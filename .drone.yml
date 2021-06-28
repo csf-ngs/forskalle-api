@@ -1,5 +1,6 @@
 ---
 name: forskalle-cli
+type: docker
 kind: pipeline
 
 steps:
