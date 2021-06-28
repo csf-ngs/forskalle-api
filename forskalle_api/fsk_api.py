@@ -152,7 +152,7 @@ class FskApi:
     path = os.path.abspath(path)
     if not link:
       uuid = str(uuid4())[0:8]
-      link = uuid + '_'+os.path.basename(path)
+      link = f'https://ngs.vbcf.ac.at/filemanager/byurl/{uuid}_{os.path.basename(path)}'
     if not size:
       size = os.path.getsize(path)
     if not hash:

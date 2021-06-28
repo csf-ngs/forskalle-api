@@ -30,6 +30,7 @@ class TestDatafile(TestBase):
         'filetype': 'Misc'
       }
     )
+    self.assertRegex(mock_api['post'].call_args[0][1]['url'], r'^https://ngs\.vbcf\.ac\.at/filemanager/byurl/[\w\d]+_datafile$')
 
   def test_post_hash_ignore_file(self):
     with mock_fsk_api() as mock_api, self.runner.isolated_filesystem():

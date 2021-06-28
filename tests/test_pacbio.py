@@ -39,6 +39,7 @@ class TestPacbio(TestBase):
         'datafiles_hash': 'md5.checksum'
       }
     )
+    self.assertRegex(mock_api['post'].call_args[0][1]['datafiles_url'], r'^https://ngs\.vbcf\.ac\.at/filemanager/byurl/[\w\d]+_testdata$')
 
   def test_publish_download_md5(self):
     with mock_fsk_api() as mock_api, self.runner.isolated_filesystem():
