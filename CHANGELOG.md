@@ -1,3 +1,8 @@
+# v0.1.2 (2021-06-28)
+
+- fix result + datafile cmds: md5 -> hash
+- absolutize seqmate urls
+
 # v0.1.0 (2021-06-27)
 
 - *feature* import ont metadata
