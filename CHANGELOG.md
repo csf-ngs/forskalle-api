@@ -1,3 +1,8 @@
+# v0.1.3 (2021-06-29)
+
+- do not absolutize datafile URLs for post-datafile
+- less stupid datafile URL handling in general
+
 # v0.1.2 (2021-06-28)
 
 - fix result + datafile cmds: md5 -> hash
