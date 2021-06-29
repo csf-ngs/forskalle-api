@@ -30,7 +30,7 @@ class TestDatafile(TestBase):
         'filetype': 'Misc'
       }
     )
-    self.assertRegex(mock_api['post'].call_args[0][1]['url'], r'^https://ngs\.vbcf\.ac\.at/filemanager/byurl/[\w\d]+_datafile$')
+    self.assertRegex(mock_api['post'].call_args[0][1]['url'], r'^[\w\d]+_datafile$')
 
   def test_post_hash_ignore_file(self):
     with mock_fsk_api() as mock_api, self.runner.isolated_filesystem():
@@ -109,11 +109,26 @@ class TestDatafile(TestBase):
         'datafile',
         '--url', 'http://da.ham/'
       ], catch_exceptions=False)
+    self.assertEqual(result.exit_code, 1)
+    self.assertRegex(result.output, r'absolute URLs')
+    
+  def test_post_url_path(self):
+    with mock_fsk_api() as mock_api, self.runner.isolated_filesystem():
+      mock_api['post'].return_value = '{ "allt", "är bra"}'
+      with open('datafile', 'w') as fh:
+        fh.write("testdata\n")
+      with open('datafile.md5', 'w') as fh:
+        fh.write("testsum\n")
+      fullpath = os.path.abspath('datafile')
+      result = self.runner.invoke(cli, ['post-datafile',
+        'datafile',
+        '--url', 'oink'
+      ], catch_exceptions=False)
     self.assertEqual(result.exit_code, 0)
     mock_api['post'].assert_called_with(
       '/api/datafiles', {
         'path': fullpath,
-        'url': 'http://da.ham/',
+        'url': 'oink',
         'size': 9,
         'hash': 'md5.testsum',
         'filetype': 'Misc'

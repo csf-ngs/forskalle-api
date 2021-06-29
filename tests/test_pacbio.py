@@ -132,3 +132,27 @@ class TestPacbio(TestBase):
         'datafiles_hash': 'md5.checksum'
       }
     )
+
+  def test_publish_download_link_path_only(self):
+    with mock_fsk_api() as mock_api, self.runner.isolated_filesystem():
+      mock_api['post'].return_value = "{ 'allet': 'jut' }"
+      with open('testdata', 'w') as fh:
+        fh.write("testdata\n")
+      with open('testdata.md5', 'w') as fh:
+        fh.write('checksum\n')
+      fullpath = os.path.abspath('testdata')
+      result = self.runner.invoke(cli, ['publish-pacbio-download',
+        'unique',
+        'testdata',
+        '--link', 'grunz',
+      ], catch_exceptions=False)
+    self.assertEqual(result.exit_code, 0)
+    mock_api['post'].assert_called_with(
+      '/api/runs/pacbio/smrtcells/unique', {
+        'datafiles_path': fullpath,
+        'datafiles_url': 'https://ngs.vbcf.ac.at/filemanager/byurl/grunz',
+        'datafiles_size': 9,
+        'datafiles_link': None,
+        'datafiles_hash': 'md5.checksum'
+      }
+    )

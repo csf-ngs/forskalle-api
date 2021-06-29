@@ -1,4 +1,5 @@
 import typing
+import click
 import requests
 import yaml
 import os
@@ -148,11 +149,16 @@ class FskApi:
   def generate_passwords(self):
     return self.get("/api/scientists/generate_passwords")
 
-  def _prepare_datafile(self, path, link=None, size=None, hash=None):
+  def _prepare_datafile(self, path: str, link: typing.Optional[str]=None, size: typing.Optional[int]=None, hash: typing.Optional[str]=None) -> typing.Tuple[str, str, str, int, str]:
     path = os.path.abspath(path)
     if not link:
       uuid = str(uuid4())[0:8]
-      link = f'https://ngs.vbcf.ac.at/filemanager/byurl/{uuid}_{os.path.basename(path)}'
+      link = f'{uuid}_{os.path.basename(path)}'
+
+    absolute_link = link
+    if not absolute_link.startswith('http'):
+      absolute_link = f'https://ngs.vbcf.ac.at/filemanager/byurl/{link}'
+
     if not size:
       size = os.path.getsize(path)
     if not hash:
@@ -161,16 +167,20 @@ class FskApi:
       with open(path + '.md5') as md5fh:
         hash="md5."+md5fh.readline().strip().split()[0]
     
-    return (path, link, size, hash)
+    return (path, link, absolute_link, size, hash)
 
   def _publish_download(self, where, unique_id, path, link=None, size=None, hash=None, hinkskalle=None):
     if path:
-      (path, link, size, hash) = self._prepare_datafile(path, link, size, hash)
+      (path, link, absolute_link, size, hash) = self._prepare_datafile(path, link, size, hash)
+    else:
+      absolute_link = link
+      if not absolute_link.startswith('http'):
+        absolute_link = f"https://ngs.vbcf.ac.at/filemanager/byurl/{absolute_link}"
     
     cell_base = 'smrtcells' if where == 'pacbio' else 'flowcell_runs'
     return self.post(f"/api/runs/{where}/{cell_base}/{unique_id}", {
       'datafiles_path': path,
-      'datafiles_url': link,
+      'datafiles_url': absolute_link,
       'datafiles_size': size,
       'datafiles_link': hinkskalle,
       'datafiles_hash': hash,
@@ -281,7 +291,9 @@ class FskApi:
     if md5:
       logger.warn(f"using deprecated md5 parameter, should be hash")
       hash = md5
-    (path, link, size, hash) = self._prepare_datafile(path, link, size, hash)
+    if link and link.startswith('http'):
+      raise click.ClickException(f"absolute URLs will not work")
+    (path, link, absolute_link, size, hash) = self._prepare_datafile(path, link, size, hash)
     return self.post('/api/datafiles', {
       'path': path,
       'url': link,
