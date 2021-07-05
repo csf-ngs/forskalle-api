@@ -6,7 +6,7 @@ from forskalle_api.cli import cli
 
 class TestDatafile(TestBase):
   def test_help_post_datafile(self):
-    result = self.runner.invoke(cli, ['post-datafile', '--help'], catch_exceptions=False)
+    result = self.runner.invoke(cli, ['datafile', 'post', '--help'], catch_exceptions=False)
     self.assertEqual(result.exit_code, 0)
 
   def test_post(self):
@@ -17,7 +17,7 @@ class TestDatafile(TestBase):
       with open('datafile.md5', 'w') as fh:
         fh.write("testsum\n")
       fullpath = os.path.abspath('datafile')
-      result = self.runner.invoke(cli, ['post-datafile',
+      result = self.runner.invoke(cli, ['datafile', 'post',
         'datafile'
       ], catch_exceptions=False)
     self.assertEqual(result.exit_code, 0)
@@ -40,7 +40,7 @@ class TestDatafile(TestBase):
       with open('datafile.md5', 'w') as fh:
         fh.write("testsum\n")
       fullpath = os.path.abspath('datafile')
-      result = self.runner.invoke(cli, ['post-datafile',
+      result = self.runner.invoke(cli, ['datafile', 'post',
         'datafile',
         '--hash', 'blurb'
       ], catch_exceptions=False)
@@ -61,7 +61,7 @@ class TestDatafile(TestBase):
       with open('datafile', 'w') as fh:
         fh.write("testdata\n")
       fullpath = os.path.abspath('datafile')
-      result = self.runner.invoke(cli, ['post-datafile',
+      result = self.runner.invoke(cli, ['datafile', 'post',
         'datafile',
         '--hash', 'blurb'
       ], catch_exceptions=False)
@@ -82,7 +82,7 @@ class TestDatafile(TestBase):
       with open('datafile', 'w') as fh:
         fh.write("testdata\n")
       fullpath = os.path.abspath('datafile')
-      result = self.runner.invoke(cli, ['post-datafile',
+      result = self.runner.invoke(cli, ['datafile', 'post',
         'datafile',
         '--md5', 'blurb'
       ], catch_exceptions=False)
@@ -105,7 +105,7 @@ class TestDatafile(TestBase):
       with open('datafile.md5', 'w') as fh:
         fh.write("testsum\n")
       fullpath = os.path.abspath('datafile')
-      result = self.runner.invoke(cli, ['post-datafile',
+      result = self.runner.invoke(cli, ['datafile', 'post',
         'datafile',
         '--url', 'http://da.ham/'
       ], catch_exceptions=False)
@@ -120,7 +120,7 @@ class TestDatafile(TestBase):
       with open('datafile.md5', 'w') as fh:
         fh.write("testsum\n")
       fullpath = os.path.abspath('datafile')
-      result = self.runner.invoke(cli, ['post-datafile',
+      result = self.runner.invoke(cli, ['datafile', 'post',
         'datafile',
         '--url', 'oink'
       ], catch_exceptions=False)
