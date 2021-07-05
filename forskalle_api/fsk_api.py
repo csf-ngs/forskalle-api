@@ -140,6 +140,9 @@ class FskApi:
   def get_run_illumina(self, id):
     return self.get("/api/runs/illumina/{id}".format(id=id))
   
+  def get_lane_info(self, run: str, lane: str):
+    return self.get(f"/api/runs/illumina/{run}/{lane}")
+  
   def get_smrtcell_info(self, run: str, well: str):
     return self.get(f"/api/runs/pacbio/{run}/{well}")
   
