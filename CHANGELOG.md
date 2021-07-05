@@ -1,3 +1,8 @@
+# v1.0.0 (2021-07-05)
+
+- restructure commands in subgroups
+- add generated model classes for api return 
+
 # v0.1.3 (2021-06-29)
 
 - do not absolutize datafile URLs for post-datafile
