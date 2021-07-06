@@ -962,6 +962,7 @@ def plainToLane(json: dict) -> Lane:
   obj.run_unit = plainToRunUnit(json['run_unit']) if json.get('run_unit') else None
   obj.sequenced_samples = [ plainToSequencedSample(o) for o in json['sequenced_samples'] ] if json.get('sequenced_samples') else []
 
+  obj.objects = json.get('objects', {})
   return obj
 
 def serializeLane(obj: Lane) -> dict:
@@ -1028,6 +1029,7 @@ class Lane:
   run_unit: typing.Optional[RunUnit] = None
   sequenced_samples: list[SequencedSample] = field(default_factory=list)
 
+  objects: typing.Any = None
 
 # ---
 
@@ -1638,6 +1640,7 @@ def plainToOntFlowcellRun(json: dict) -> OntFlowcellRun:
   obj.run_unit = plainToRunUnit(json['run_unit']) if json.get('run_unit') else None
   obj.sequenced_samples = [ plainToSequencedSample(o) for o in json['sequenced_samples'] ] if json.get('sequenced_samples') else []
 
+  obj.objects = json.get('objects', {})
   return obj
 
 def serializeOntFlowcellRun(obj: OntFlowcellRun) -> dict:
@@ -1746,6 +1749,7 @@ class OntFlowcellRun:
   run_unit: typing.Optional[RunUnit] = None
   sequenced_samples: list[SequencedSample] = field(default_factory=list)
 
+  objects: typing.Any = None
 
 # ---
 
@@ -4235,6 +4239,7 @@ def plainToSmrtCell(json: dict) -> SmrtCell:
   obj.run_unit = plainToRunUnit(json['run_unit']) if json.get('run_unit') else None
   obj.sequenced_samples = [ plainToSequencedSample(o) for o in json['sequenced_samples'] ] if json.get('sequenced_samples') else []
 
+  obj.objects = json.get('objects', {})
   return obj
 
 def serializeSmrtCell(obj: SmrtCell) -> dict:
@@ -4349,6 +4354,7 @@ class SmrtCell:
   run_unit: typing.Optional[RunUnit] = None
   sequenced_samples: list[SequencedSample] = field(default_factory=list)
 
+  objects: typing.Any = None
 
 # ---
 
