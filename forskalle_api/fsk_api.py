@@ -144,7 +144,10 @@ class FskApi:
     return plainToIlluminaRun(self.get("/api/runs/illumina/{id}".format(id=id)))
   
   def get_lane_info(self, run: str, lane: str) -> Lane:
-    return plainToLane(self.get(f"/api/runs/illumina/{run}/{lane}"))
+    lane_index = int(lane) - 1
+    fc_obj = self.get(f"/api/runs/illumina/{run}")
+    lane_obj = fc_obj['lanes'][lane_index]
+    return plainToLane(lane_obj)
   
   def get_smrtcell_info(self, run: str, well: str) -> SmrtCell:
     return plainToSmrtCell(self.get(f"/api/runs/pacbio/{run}/{well}"))
