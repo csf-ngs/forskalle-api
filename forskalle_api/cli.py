@@ -4,7 +4,7 @@ import click_log
 import json
 import logging
 import shutil
-from forskalle_api.auto.models import Run, RunUnit, Sample, SequencedSample, plainToRequest, serializeMultiplex, serializeOntFlowcellRun, serializeOntRun, serializePacbioRun, serializeRequest, serializeRunUnit, serializeSample, serializeSequencedBarcode, serializeSequencedSample, serializeSmrtCell, Request
+from forskalle_api.auto.models import Run, RunUnit, Sample, SequencedSample, plainToRequest, serializeMultiplex, serializeOntFlowcellRun, serializeOntRun, serializePacbioRun, serializeRequest, serializeRunUnit, serializeSample, serializeSequencedBarcode, serializeSequencedSample, serializeSmrtCell, Request, serializeRequestsSample
 from forskalle_api.fsk_api import FskApi
 
 from forskalle_api.fsk_query import FskPagedQuery, FskQuery
@@ -273,6 +273,14 @@ def get_sample_sequencing(obj: FskApi, sample_id, out, csv=False):
     out.write(ret)
   else:
     out.write(json.dumps([ serializeSequencedSample(r) for r in ret if type(r) is SequencedSample ], indent=2, sort_keys=True))
+
+@samples.command(short_help='get request information for a sample', name='requests')
+@click.argument('sample_id')
+@click.option('--out', '-o', type=click.File("w"), default='-')
+@click.pass_obj
+def get_sample_requests(obj: FskApi, sample_id, out):
+  ret = FskApi().get_sample_requests(sample_id)
+  out.write(json.dumps([ serializeRequestsSample(r) for r in ret ], indent=2, sort_keys=True))
 
 @cli.group(short_help='pacbio stuff (admin only)')
 def pacbio():

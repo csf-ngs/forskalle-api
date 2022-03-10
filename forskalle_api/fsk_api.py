@@ -1,6 +1,6 @@
 import typing
 import click
-from forskalle_api.auto.models import ApiKey, Group, Lane, Multiplex, Nanostat, OntFlowcellRun, OntRun, PacbioRun, Request, RunUnit, Sample, Scientist, IlluminaRun, SequencedBarcode, SequencedSample, SmrtCell, Subreadstat, plainToApiKey, plainToGroup, plainToIlluminaRun, plainToLane, plainToMultiplex, plainToNanostat, plainToOntFlowcellRun, plainToOntRun, plainToPacbioRun, plainToRequest, plainToRunUnit, plainToSample, plainToScientist, plainToSequencedBarcode, plainToSequencedSample, plainToSmrtCell, plainToSubreadstat
+from forskalle_api.auto.models import ApiKey, Group, Lane, Multiplex, Nanostat, OntFlowcellRun, OntRun, PacbioRun, Request, RunUnit, Sample, Scientist, IlluminaRun, SequencedBarcode, SequencedSample, SmrtCell, Subreadstat, plainToApiKey, plainToGroup, plainToIlluminaRun, plainToLane, plainToMultiplex, plainToNanostat, plainToOntFlowcellRun, plainToOntRun, plainToPacbioRun, plainToRequest, plainToRunUnit, plainToSample, plainToScientist, plainToSequencedBarcode, plainToSequencedSample, plainToSmrtCell, plainToSubreadstat, RequestsSample, plainToRequestsSample
 import requests
 import yaml
 import os
@@ -273,6 +273,12 @@ class FskApi:
       return self.get_csv(url+'.csv')
     else:
       return [ plainToSequencedSample(r) for r in self.get(url) ]
+    
+  def get_sample_requests(self, sample_id) -> typing.List[RequestsSample]:
+    url = f"/api/samples/{sample_id}?include_requests=1"
+    return [ plainToRequestsSample(rs) for rs in self.get(url)['requests_samples'] ]
+
+
   
   def get_multi(self, id) -> Multiplex:
     return plainToMultiplex(self.get('/api/multiplexes/{multi_id}'.format(multi_id=id)))
