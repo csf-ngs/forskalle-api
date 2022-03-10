@@ -1,3 +1,7 @@
+# v1.0.1 (2022-03-10)
+
+- #6 get sample requests
+
 # v1.0.0 (2021-07-05)
 
 - restructure commands in subgroups
