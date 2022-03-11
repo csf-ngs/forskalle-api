@@ -84,6 +84,7 @@ class FskApi:
 
 
   def post(self, route: str, data) -> dict:
+    logger.debug(f"POST to {route} with {data}")
     r = requests.post(self.base+route, headers=self.make_headers(), json=data)
     if r.status_code != requests.codes.ok:
       self.handle_error(r)
