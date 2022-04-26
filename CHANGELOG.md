@@ -1,3 +1,7 @@
+# v1.0.2 (2022-04-26)
+
+- update models
+
 # v1.0.1 (2022-03-10)
 
 - #6 get sample requests
