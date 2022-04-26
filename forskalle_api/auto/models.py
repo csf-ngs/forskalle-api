@@ -78,9 +78,10 @@ def plainToApiKey(json: dict) -> ApiKey:
   obj.created = datetime.fromisoformat(json.get('created', '')) if json.get('created') else None
   obj.description = json.get('description')
   obj.expiration = datetime.fromisoformat(json.get('expiration', '')) if json.get('expiration') else None
+  obj.generated_key = json.get('generated_key')
   obj.id = json.get('id')
   obj.internal = bool(json.get('internal'))
-  obj.key = json.get('key')
+  obj.key_uid = json.get('key_uid')
   obj.role = json.get('role')
   obj.scientist_id = json.get('scientist_id')
   obj.routes = [ plainToApiKeyRoute(o) for o in json['routes'] ] if json.get('routes') else []
@@ -94,9 +95,10 @@ def serializeApiKey(obj: ApiKey) -> dict:
   json['created'] = obj.created.isoformat() if obj.created else None
   json['description'] = obj.description
   json['expiration'] = obj.expiration.isoformat() if obj.expiration else None
+  json['generated_key'] = obj.generated_key
   json['id'] = obj.id
   json['internal'] = obj.internal
-  json['key'] = obj.key
+  json['key_uid'] = obj.key_uid
   json['role'] = obj.role
   json['scientist_id'] = obj.scientist_id
   if obj.routes is not None:
@@ -112,9 +114,10 @@ class ApiKey:
   created: typing.Optional[datetime] = None
   description: typing.Optional[str] = None
   expiration: typing.Optional[datetime] = None
+  generated_key: typing.Optional[str] = None
   id: typing.Optional[typing.Union[int, float]] = None
   internal: typing.Optional[bool] = None
-  key: typing.Optional[str] = None
+  key_uid: typing.Optional[str] = None
   role: typing.Optional[str] = None
   scientist_id: typing.Optional[typing.Union[int, float]] = None
 
@@ -328,6 +331,207 @@ class ControlSample:
   
   control_sample: typing.Optional[Sample] = None
   sample: typing.Optional[Sample] = None
+
+
+# ---
+
+def plainToCostEstimate(json: dict) -> CostEstimate:
+  obj = CostEstimate()
+  obj.category_totals = json.get('category_totals')
+  obj.created = datetime.fromisoformat(json.get('created', '')) if json.get('created') else None
+  obj.group = json.get('group')
+  obj.group_id = json.get('group_id')
+  obj.id = json.get('id')
+  obj.last_change = datetime.fromisoformat(json.get('last_change', '')) if json.get('last_change') else None
+  obj.price_list = plainToPriceList(json['price_list']) if json.get('price_list') else None
+  obj.price_list_id = json.get('price_list_id')
+  obj.pricing_category = json.get('pricing_category')
+  obj.project_name = json.get('project_name')
+  obj.reference = json.get('reference')
+  obj.request = plainToEstimateRequest(json['request']) if json.get('request') else None
+  obj.request_id = json.get('request_id')
+  obj.scientist = json.get('scientist')
+  obj.scientist_id = json.get('scientist_id')
+  obj.status = json.get('status')
+  obj.total = json.get('total')
+  obj.cost_estimate_items = [ plainToCostEstimateItem(o) for o in json['cost_estimate_items'] ] if json.get('cost_estimate_items') else []
+  obj.group_ref = plainToGroup(json['group_ref']) if json.get('group_ref') else None
+  obj.items = [ plainToCostEstimateItem(o) for o in json['items'] ] if json.get('items') else []
+  obj.price_list_ref = plainToPriceList(json['price_list_ref']) if json.get('price_list_ref') else None
+  obj.pricing_category_ref = plainToPricingCategory(json['pricing_category_ref']) if json.get('pricing_category_ref') else None
+  obj.scientist_ref = plainToScientist(json['scientist_ref']) if json.get('scientist_ref') else None
+
+  return obj
+
+def serializeCostEstimate(obj: CostEstimate) -> dict:
+  json = {}
+  json['category_totals'] = obj.category_totals
+  json['created'] = obj.created.isoformat() if obj.created else None
+  json['group'] = obj.group
+  json['group_id'] = obj.group_id
+  json['id'] = obj.id
+  json['last_change'] = obj.last_change.isoformat() if obj.last_change else None
+  json['price_list'] = serializePriceList(obj.price_list) if obj.price_list is not None else None
+  json['price_list_id'] = obj.price_list_id
+  json['pricing_category'] = obj.pricing_category
+  json['project_name'] = obj.project_name
+  json['reference'] = obj.reference
+  json['request'] = serializeEstimateRequest(obj.request) if obj.request is not None else None
+  json['request_id'] = obj.request_id
+  json['scientist'] = obj.scientist
+  json['scientist_id'] = obj.scientist_id
+  json['status'] = obj.status
+  json['total'] = obj.total
+  if obj.cost_estimate_items is not None:
+    json['cost_estimate_items'] = [ serializeCostEstimateItem(o) for o in obj.cost_estimate_items ]
+  json['group_ref'] = serializeGroup(obj.group_ref) if obj.group_ref is not None else None
+  if obj.items is not None:
+    json['items'] = [ serializeCostEstimateItem(o) for o in obj.items ]
+  json['price_list_ref'] = serializePriceList(obj.price_list_ref) if obj.price_list_ref is not None else None
+  json['pricing_category_ref'] = serializePricingCategory(obj.pricing_category_ref) if obj.pricing_category_ref is not None else None
+  json['scientist_ref'] = serializeScientist(obj.scientist_ref) if obj.scientist_ref is not None else None
+
+  return json
+
+
+@dataclass
+class CostEstimate:
+  category_totals: typing.Optional[dict] = None
+  created: typing.Optional[datetime] = None
+  group: typing.Optional[typing.Any] = None
+  group_id: typing.Optional[typing.Union[int, float]] = None
+  id: typing.Optional[typing.Union[int, float]] = None
+  last_change: typing.Optional[datetime] = None
+  price_list: typing.Optional[PriceList] = None
+  price_list_id: typing.Optional[typing.Union[int, float]] = None
+  pricing_category: typing.Optional[str] = None
+  project_name: typing.Optional[str] = None
+  reference: typing.Optional[str] = None
+  request: typing.Optional[EstimateRequest] = None
+  request_id: typing.Optional[typing.Union[int, float]] = None
+  scientist: typing.Optional[typing.Any] = None
+  scientist_id: typing.Optional[typing.Union[int, float]] = None
+  status: typing.Optional[str] = None
+  total: typing.Optional[typing.Union[int, float]] = None
+
+  
+  cost_estimate_items: list[CostEstimateItem] = field(default_factory=list)
+  group_ref: typing.Optional[Group] = None
+  items: list[CostEstimateItem] = field(default_factory=list)
+  price_list_ref: typing.Optional[PriceList] = None
+  pricing_category_ref: typing.Optional[PricingCategory] = None
+  scientist_ref: typing.Optional[Scientist] = None
+
+
+# ---
+
+def plainToCostEstimateItem(json: dict) -> CostEstimateItem:
+  obj = CostEstimateItem()
+  obj.category = json.get('category')
+  obj.code = json.get('code')
+  obj.cost_estimate_id = json.get('cost_estimate_id')
+  obj.count = json.get('count')
+  obj.description = json.get('description')
+  obj.discount = json.get('discount')
+  obj.heading = json.get('heading')
+  obj.id = json.get('id')
+  obj.item_id = json.get('item_id')
+  obj.manual = bool(json.get('manual'))
+  obj.price = json.get('price')
+  obj.sort_order = json.get('sort_order')
+  obj.total = json.get('total')
+  obj.cost_estimate = plainToCostEstimate(json['cost_estimate']) if json.get('cost_estimate') else None
+  obj.item = plainToPriceListItem(json['item']) if json.get('item') else None
+
+  return obj
+
+def serializeCostEstimateItem(obj: CostEstimateItem) -> dict:
+  json = {}
+  json['category'] = obj.category
+  json['code'] = obj.code
+  json['cost_estimate_id'] = obj.cost_estimate_id
+  json['count'] = obj.count
+  json['description'] = obj.description
+  json['discount'] = obj.discount
+  json['heading'] = obj.heading
+  json['id'] = obj.id
+  json['item_id'] = obj.item_id
+  json['manual'] = obj.manual
+  json['price'] = obj.price
+  json['sort_order'] = obj.sort_order
+  json['total'] = obj.total
+  json['cost_estimate'] = serializeCostEstimate(obj.cost_estimate) if obj.cost_estimate is not None else None
+  json['item'] = serializePriceListItem(obj.item) if obj.item is not None else None
+
+  return json
+
+
+@dataclass
+class CostEstimateItem:
+  category: typing.Optional[str] = None
+  code: typing.Optional[str] = None
+  cost_estimate_id: typing.Optional[typing.Union[int, float]] = None
+  count: typing.Optional[typing.Union[int, float]] = None
+  description: typing.Optional[str] = None
+  discount: typing.Optional[typing.Union[int, float]] = None
+  heading: typing.Optional[str] = None
+  id: typing.Optional[typing.Union[int, float]] = None
+  item_id: typing.Optional[typing.Union[int, float]] = None
+  manual: typing.Optional[bool] = None
+  price: typing.Optional[typing.Union[int, float]] = None
+  sort_order: typing.Optional[str] = None
+  total: typing.Optional[typing.Union[int, float]] = None
+
+  
+  cost_estimate: typing.Optional[CostEstimate] = None
+  item: typing.Optional[PriceListItem] = None
+
+
+# ---
+
+def plainToCutoutSize(json: dict) -> CutoutSize:
+  obj = CutoutSize()
+  obj.available = bool(json.get('available'))
+  obj.cutout_size = json.get('cutout_size')
+  obj.kit = json.get('kit')
+  obj.platform = json.get('platform')
+  obj.prep_type = json.get('prep_type')
+  obj.platform_ref = plainToPlatform(json['platform_ref']) if json.get('platform_ref') else None
+  obj.preparation_kits_ref = plainToPreparationKit(json['preparation_kits_ref']) if json.get('preparation_kits_ref') else None
+  obj.preparation_types_ref = plainToPreparationType(json['preparation_types_ref']) if json.get('preparation_types_ref') else None
+  obj.samples = [ plainToSample(o) for o in json['samples'] ] if json.get('samples') else []
+
+  return obj
+
+def serializeCutoutSize(obj: CutoutSize) -> dict:
+  json = {}
+  json['available'] = obj.available
+  json['cutout_size'] = obj.cutout_size
+  json['kit'] = obj.kit
+  json['platform'] = obj.platform
+  json['prep_type'] = obj.prep_type
+  json['platform_ref'] = serializePlatform(obj.platform_ref) if obj.platform_ref is not None else None
+  json['preparation_kits_ref'] = serializePreparationKit(obj.preparation_kits_ref) if obj.preparation_kits_ref is not None else None
+  json['preparation_types_ref'] = serializePreparationType(obj.preparation_types_ref) if obj.preparation_types_ref is not None else None
+  if obj.samples is not None:
+    json['samples'] = [ serializeSample(o) for o in obj.samples ]
+
+  return json
+
+
+@dataclass
+class CutoutSize:
+  available: typing.Optional[bool] = None
+  cutout_size: typing.Optional[str] = None
+  kit: typing.Optional[str] = None
+  platform: typing.Optional[str] = None
+  prep_type: typing.Optional[str] = None
+
+  
+  platform_ref: typing.Optional[Platform] = None
+  preparation_kits_ref: typing.Optional[PreparationKit] = None
+  preparation_types_ref: typing.Optional[PreparationType] = None
+  samples: list[Sample] = field(default_factory=list)
 
 
 # ---
@@ -896,6 +1100,169 @@ class InventoryItem:
   
   inventory_changes: list[InventoryChange] = field(default_factory=list)
   pricing_item: typing.Optional[PricingItem] = None
+
+
+# ---
+
+def plainToInvoice(json: dict) -> Invoice:
+  obj = Invoice()
+  obj.category_totals = json.get('category_totals')
+  obj.created = datetime.fromisoformat(json.get('created', '')) if json.get('created') else None
+  obj.group = json.get('group')
+  obj.group_id = json.get('group_id')
+  obj.id = json.get('id')
+  obj.last_change = datetime.fromisoformat(json.get('last_change', '')) if json.get('last_change') else None
+  obj.price_list = plainToPriceList(json['price_list']) if json.get('price_list') else None
+  obj.price_list_id = json.get('price_list_id')
+  obj.pricing_category = json.get('pricing_category')
+  obj.project_name = json.get('project_name')
+  obj.reference = json.get('reference')
+  obj.request = plainToEstimateRequest(json['request']) if json.get('request') else None
+  obj.request_id = json.get('request_id')
+  obj.scientist = json.get('scientist')
+  obj.scientist_id = json.get('scientist_id')
+  obj.status = json.get('status')
+  obj.total = json.get('total')
+  obj.group_ref = plainToGroup(json['group_ref']) if json.get('group_ref') else None
+  obj.invoice_items = [ plainToInvoiceItem(o) for o in json['invoice_items'] ] if json.get('invoice_items') else []
+  obj.items = [ plainToInvoiceItem(o) for o in json['items'] ] if json.get('items') else []
+  obj.price_list_ref = plainToPriceList(json['price_list_ref']) if json.get('price_list_ref') else None
+  obj.pricing_category_ref = plainToPricingCategory(json['pricing_category_ref']) if json.get('pricing_category_ref') else None
+  obj.scientist_ref = plainToScientist(json['scientist_ref']) if json.get('scientist_ref') else None
+
+  return obj
+
+def serializeInvoice(obj: Invoice) -> dict:
+  json = {}
+  json['category_totals'] = obj.category_totals
+  json['created'] = obj.created.isoformat() if obj.created else None
+  json['group'] = obj.group
+  json['group_id'] = obj.group_id
+  json['id'] = obj.id
+  json['last_change'] = obj.last_change.isoformat() if obj.last_change else None
+  json['price_list'] = serializePriceList(obj.price_list) if obj.price_list is not None else None
+  json['price_list_id'] = obj.price_list_id
+  json['pricing_category'] = obj.pricing_category
+  json['project_name'] = obj.project_name
+  json['reference'] = obj.reference
+  json['request'] = serializeEstimateRequest(obj.request) if obj.request is not None else None
+  json['request_id'] = obj.request_id
+  json['scientist'] = obj.scientist
+  json['scientist_id'] = obj.scientist_id
+  json['status'] = obj.status
+  json['total'] = obj.total
+  json['group_ref'] = serializeGroup(obj.group_ref) if obj.group_ref is not None else None
+  if obj.invoice_items is not None:
+    json['invoice_items'] = [ serializeInvoiceItem(o) for o in obj.invoice_items ]
+  if obj.items is not None:
+    json['items'] = [ serializeInvoiceItem(o) for o in obj.items ]
+  json['price_list_ref'] = serializePriceList(obj.price_list_ref) if obj.price_list_ref is not None else None
+  json['pricing_category_ref'] = serializePricingCategory(obj.pricing_category_ref) if obj.pricing_category_ref is not None else None
+  json['scientist_ref'] = serializeScientist(obj.scientist_ref) if obj.scientist_ref is not None else None
+
+  return json
+
+
+@dataclass
+class Invoice:
+  category_totals: typing.Optional[dict] = None
+  created: typing.Optional[datetime] = None
+  group: typing.Optional[typing.Any] = None
+  group_id: typing.Optional[typing.Union[int, float]] = None
+  id: typing.Optional[typing.Union[int, float]] = None
+  last_change: typing.Optional[datetime] = None
+  price_list: typing.Optional[PriceList] = None
+  price_list_id: typing.Optional[typing.Union[int, float]] = None
+  pricing_category: typing.Optional[str] = None
+  project_name: typing.Optional[str] = None
+  reference: typing.Optional[str] = None
+  request: typing.Optional[EstimateRequest] = None
+  request_id: typing.Optional[typing.Union[int, float]] = None
+  scientist: typing.Optional[typing.Any] = None
+  scientist_id: typing.Optional[typing.Union[int, float]] = None
+  status: typing.Optional[str] = None
+  total: typing.Optional[typing.Union[int, float]] = None
+
+  
+  group_ref: typing.Optional[Group] = None
+  invoice_items: list[InvoiceItem] = field(default_factory=list)
+  items: list[InvoiceItem] = field(default_factory=list)
+  price_list_ref: typing.Optional[PriceList] = None
+  pricing_category_ref: typing.Optional[PricingCategory] = None
+  scientist_ref: typing.Optional[Scientist] = None
+
+
+# ---
+
+def plainToInvoiceItem(json: dict) -> InvoiceItem:
+  obj = InvoiceItem()
+  obj.category = json.get('category')
+  obj.code = json.get('code')
+  obj.count = json.get('count')
+  obj.description = json.get('description')
+  obj.discount = json.get('discount')
+  obj.heading = json.get('heading')
+  obj.id = json.get('id')
+  obj.invoice_id = json.get('invoice_id')
+  obj.item_id = json.get('item_id')
+  obj.manual = bool(json.get('manual'))
+  obj.price = json.get('price')
+  obj.reason = json.get('reason')
+  obj.sent_date = datetime.fromisoformat(json.get('sent_date', '')) if json.get('sent_date') else None
+  obj.sort_order = json.get('sort_order')
+  obj.status = json.get('status')
+  obj.total = json.get('total')
+  obj.invoice = plainToInvoice(json['invoice']) if json.get('invoice') else None
+  obj.item = plainToPriceListItem(json['item']) if json.get('item') else None
+
+  return obj
+
+def serializeInvoiceItem(obj: InvoiceItem) -> dict:
+  json = {}
+  json['category'] = obj.category
+  json['code'] = obj.code
+  json['count'] = obj.count
+  json['description'] = obj.description
+  json['discount'] = obj.discount
+  json['heading'] = obj.heading
+  json['id'] = obj.id
+  json['invoice_id'] = obj.invoice_id
+  json['item_id'] = obj.item_id
+  json['manual'] = obj.manual
+  json['price'] = obj.price
+  json['reason'] = obj.reason
+  json['sent_date'] = obj.sent_date.isoformat() if obj.sent_date else None
+  json['sort_order'] = obj.sort_order
+  json['status'] = obj.status
+  json['total'] = obj.total
+  json['invoice'] = serializeInvoice(obj.invoice) if obj.invoice is not None else None
+  json['item'] = serializePriceListItem(obj.item) if obj.item is not None else None
+
+  return json
+
+
+@dataclass
+class InvoiceItem:
+  category: typing.Optional[str] = None
+  code: typing.Optional[str] = None
+  count: typing.Optional[typing.Union[int, float]] = None
+  description: typing.Optional[str] = None
+  discount: typing.Optional[typing.Union[int, float]] = None
+  heading: typing.Optional[str] = None
+  id: typing.Optional[typing.Union[int, float]] = None
+  invoice_id: typing.Optional[typing.Union[int, float]] = None
+  item_id: typing.Optional[typing.Union[int, float]] = None
+  manual: typing.Optional[bool] = None
+  price: typing.Optional[typing.Union[int, float]] = None
+  reason: typing.Optional[str] = None
+  sent_date: typing.Optional[datetime] = None
+  sort_order: typing.Optional[str] = None
+  status: typing.Optional[str] = None
+  total: typing.Optional[typing.Union[int, float]] = None
+
+  
+  invoice: typing.Optional[Invoice] = None
+  item: typing.Optional[PriceListItem] = None
 
 
 # ---
@@ -1987,7 +2354,6 @@ class PacbioRun:
 
 def plainToPlatform(json: dict) -> Platform:
   obj = Platform()
-  obj.analysis_pipelines = [ plainToAnalysisPipeline(o) for o in json['analysis_pipelines'] ] if json.get('analysis_pipelines') else []
   obj.description = json.get('description')
   obj.name = json.get('name')
   obj.readmodes = [ plainToReadmode(o) for o in json['readmodes'] ] if json.get('readmodes') else []
@@ -2004,8 +2370,6 @@ def plainToPlatform(json: dict) -> Platform:
 
 def serializePlatform(obj: Platform) -> dict:
   json = {}
-  if obj.analysis_pipelines is not None:
-    json['analysis_pipelines'] = [ serializeAnalysisPipeline(o) for o in obj.analysis_pipelines ]
   json['description'] = obj.description
   json['name'] = obj.name
   if obj.readmodes is not None:
@@ -2031,7 +2395,6 @@ def serializePlatform(obj: Platform) -> dict:
 
 @dataclass
 class Platform:
-  analysis_pipelines: list[AnalysisPipeline]=field(default_factory=list)
   description: typing.Optional[str] = None
   name: typing.Optional[str] = None
   readmodes: list[Readmode]=field(default_factory=list)
@@ -2071,6 +2434,7 @@ def plainToPreparationKit(json: dict) -> PreparationKit:
   obj.strand_specific = bool(json.get('strand_specific'))
   obj.adaptor_type_ref = plainToAdaptorType(json['adaptor_type_ref']) if json.get('adaptor_type_ref') else None
   obj.additional_qc_item = plainToPricingItem(json['additional_qc_item']) if json.get('additional_qc_item') else None
+  obj.cutout_sizes = [ plainToCutoutSize(o) for o in json['cutout_sizes'] ] if json.get('cutout_sizes') else []
   obj.platform_ref = plainToPlatform(json['platform_ref']) if json.get('platform_ref') else None
   obj.preparation_type_ref = plainToPreparationType(json['preparation_type_ref']) if json.get('preparation_type_ref') else None
   obj.pricing_item = plainToPricingItem(json['pricing_item']) if json.get('pricing_item') else None
@@ -2100,6 +2464,8 @@ def serializePreparationKit(obj: PreparationKit) -> dict:
   json['strand_specific'] = obj.strand_specific
   json['adaptor_type_ref'] = serializeAdaptorType(obj.adaptor_type_ref) if obj.adaptor_type_ref is not None else None
   json['additional_qc_item'] = serializePricingItem(obj.additional_qc_item) if obj.additional_qc_item is not None else None
+  if obj.cutout_sizes is not None:
+    json['cutout_sizes'] = [ serializeCutoutSize(o) for o in obj.cutout_sizes ]
   json['platform_ref'] = serializePlatform(obj.platform_ref) if obj.platform_ref is not None else None
   json['preparation_type_ref'] = serializePreparationType(obj.preparation_type_ref) if obj.preparation_type_ref is not None else None
   json['pricing_item'] = serializePricingItem(obj.pricing_item) if obj.pricing_item is not None else None
@@ -2133,6 +2499,7 @@ class PreparationKit:
   
   adaptor_type_ref: typing.Optional[AdaptorType] = None
   additional_qc_item: typing.Optional[PricingItem] = None
+  cutout_sizes: list[CutoutSize] = field(default_factory=list)
   platform_ref: typing.Optional[Platform] = None
   preparation_type_ref: typing.Optional[PreparationType] = None
   pricing_item: typing.Optional[PricingItem] = None
@@ -2260,6 +2627,7 @@ def plainToPriceListItem(json: dict) -> PriceListItem:
   obj = PriceListItem()
   obj.category = json.get('category')
   obj.code = json.get('code')
+  obj.comment = json.get('comment')
   obj.count = json.get('count')
   obj.description = json.get('description')
   obj.id = json.get('id')
@@ -2280,6 +2648,7 @@ def serializePriceListItem(obj: PriceListItem) -> dict:
   json = {}
   json['category'] = obj.category
   json['code'] = obj.code
+  json['comment'] = obj.comment
   json['count'] = obj.count
   json['description'] = obj.description
   json['id'] = obj.id
@@ -2302,8 +2671,9 @@ def serializePriceListItem(obj: PriceListItem) -> dict:
 class PriceListItem:
   category: typing.Optional[str] = None
   code: typing.Optional[str] = None
+  comment: typing.Optional[str] = None
   count: typing.Optional[typing.Union[int, float]] = None
-  description: typing.Optional[typing.Any] = None
+  description: typing.Optional[str] = None
   id: typing.Optional[typing.Union[int, float]] = None
   item: typing.Optional[str] = None
   ordering: typing.Optional[typing.Union[int, float]] = None
@@ -2360,6 +2730,8 @@ class PricingCategory:
 def plainToPricingItem(json: dict) -> PricingItem:
   obj = PricingItem()
   obj.base_item = json.get('base_item')
+  obj.category = json.get('category')
+  obj.comment = json.get('comment')
   obj.count_bracket_max = json.get('count_bracket_max')
   obj.count_bracket_min = json.get('count_bracket_min')
   obj.description = json.get('description')
@@ -2378,6 +2750,8 @@ def plainToPricingItem(json: dict) -> PricingItem:
 def serializePricingItem(obj: PricingItem) -> dict:
   json = {}
   json['base_item'] = obj.base_item
+  json['category'] = obj.category
+  json['comment'] = obj.comment
   json['count_bracket_max'] = obj.count_bracket_max
   json['count_bracket_min'] = obj.count_bracket_min
   json['description'] = obj.description
@@ -2401,6 +2775,8 @@ def serializePricingItem(obj: PricingItem) -> dict:
 @dataclass
 class PricingItem:
   base_item: typing.Optional[str] = None
+  category: typing.Optional[str] = None
+  comment: typing.Optional[str] = None
   count_bracket_max: typing.Optional[typing.Union[int, float]] = None
   count_bracket_min: typing.Optional[typing.Union[int, float]] = None
   description: typing.Optional[str] = None
@@ -2670,10 +3046,10 @@ def plainToRequest(json: dict) -> Request:
   obj.submitted = datetime.fromisoformat(json.get('submitted', '')) if json.get('submitted') else None
   obj.xp_workflow_enabled = bool(json.get('xp_workflow_enabled'))
   obj.attachments = [ plainToAttachment(o) for o in json['attachments'] ] if json.get('attachments') else []
-  obj.cost_estimate_items = [ plainToRequestCostEstimateItem(o) for o in json['cost_estimate_items'] ] if json.get('cost_estimate_items') else []
+  obj.cost_estimate_ref = plainToCostEstimate(json['cost_estimate_ref']) if json.get('cost_estimate_ref') else None
   obj.data_entries = [ plainToDataEntry(o) for o in json['data_entries'] ] if json.get('data_entries') else []
   obj.group_ref = plainToGroup(json['group_ref']) if json.get('group_ref') else None
-  obj.invoice_items = [ plainToRequestInvoiceItem(o) for o in json['invoice_items'] ] if json.get('invoice_items') else []
+  obj.invoice_ref = plainToInvoice(json['invoice_ref']) if json.get('invoice_ref') else None
   obj.notes = [ plainToNote(o) for o in json['notes'] ] if json.get('notes') else []
   obj.parent_request_ref = plainToRequest(json['parent_request_ref']) if json.get('parent_request_ref') else None
   obj.platform_ref = plainToPlatform(json['platform_ref']) if json.get('platform_ref') else None
@@ -2733,13 +3109,11 @@ def serializeRequest(obj: Request) -> dict:
   json['xp_workflow_enabled'] = obj.xp_workflow_enabled
   if obj.attachments is not None:
     json['attachments'] = [ serializeAttachment(o) for o in obj.attachments ]
-  if obj.cost_estimate_items is not None:
-    json['cost_estimate_items'] = [ serializeRequestCostEstimateItem(o) for o in obj.cost_estimate_items ]
+  json['cost_estimate_ref'] = serializeCostEstimate(obj.cost_estimate_ref) if obj.cost_estimate_ref is not None else None
   if obj.data_entries is not None:
     json['data_entries'] = [ serializeDataEntry(o) for o in obj.data_entries ]
   json['group_ref'] = serializeGroup(obj.group_ref) if obj.group_ref is not None else None
-  if obj.invoice_items is not None:
-    json['invoice_items'] = [ serializeRequestInvoiceItem(o) for o in obj.invoice_items ]
+  json['invoice_ref'] = serializeInvoice(obj.invoice_ref) if obj.invoice_ref is not None else None
   if obj.notes is not None:
     json['notes'] = [ serializeNote(o) for o in obj.notes ]
   json['parent_request_ref'] = serializeRequest(obj.parent_request_ref) if obj.parent_request_ref is not None else None
@@ -2803,10 +3177,10 @@ class Request:
 
   
   attachments: list[Attachment] = field(default_factory=list)
-  cost_estimate_items: list[RequestCostEstimateItem] = field(default_factory=list)
+  cost_estimate_ref: typing.Optional[CostEstimate] = None
   data_entries: list[DataEntry] = field(default_factory=list)
   group_ref: typing.Optional[Group] = None
-  invoice_items: list[RequestInvoiceItem] = field(default_factory=list)
+  invoice_ref: typing.Optional[Invoice] = None
   notes: list[Note] = field(default_factory=list)
   parent_request_ref: typing.Optional[Request] = None
   platform_ref: typing.Optional[Platform] = None
@@ -2815,70 +3189,6 @@ class Request:
   scientist_ref: typing.Optional[Scientist] = None
   shadow_requests: list[Request] = field(default_factory=list)
   versions: list[ObjectVersion] = field(default_factory=list)
-
-
-# ---
-
-def plainToRequestCostEstimateItem(json: dict) -> RequestCostEstimateItem:
-  obj = RequestCostEstimateItem()
-  obj.category = json.get('category')
-  obj.code = json.get('code')
-  obj.count = json.get('count')
-  obj.description = json.get('description')
-  obj.discount = json.get('discount')
-  obj.heading = json.get('heading')
-  obj.id = json.get('id')
-  obj.item_id = json.get('item_id')
-  obj.manual = bool(json.get('manual'))
-  obj.price = json.get('price')
-  obj.request_id = json.get('request_id')
-  obj.sort_order = json.get('sort_order')
-  obj.total = json.get('total')
-  obj.item = plainToPriceListItem(json['item']) if json.get('item') else None
-  obj.request = plainToRequest(json['request']) if json.get('request') else None
-
-  return obj
-
-def serializeRequestCostEstimateItem(obj: RequestCostEstimateItem) -> dict:
-  json = {}
-  json['category'] = obj.category
-  json['code'] = obj.code
-  json['count'] = obj.count
-  json['description'] = obj.description
-  json['discount'] = obj.discount
-  json['heading'] = obj.heading
-  json['id'] = obj.id
-  json['item_id'] = obj.item_id
-  json['manual'] = obj.manual
-  json['price'] = obj.price
-  json['request_id'] = obj.request_id
-  json['sort_order'] = obj.sort_order
-  json['total'] = obj.total
-  json['item'] = serializePriceListItem(obj.item) if obj.item is not None else None
-  json['request'] = serializeRequest(obj.request) if obj.request is not None else None
-
-  return json
-
-
-@dataclass
-class RequestCostEstimateItem:
-  category: typing.Optional[str] = None
-  code: typing.Optional[str] = None
-  count: typing.Optional[typing.Union[int, float]] = None
-  description: typing.Optional[str] = None
-  discount: typing.Optional[typing.Union[int, float]] = None
-  heading: typing.Optional[str] = None
-  id: typing.Optional[typing.Union[int, float]] = None
-  item_id: typing.Optional[typing.Union[int, float]] = None
-  manual: typing.Optional[bool] = None
-  price: typing.Optional[typing.Union[int, float]] = None
-  request_id: typing.Optional[typing.Union[int, float]] = None
-  sort_order: typing.Optional[str] = None
-  total: typing.Optional[typing.Union[int, float]] = None
-
-  
-  item: typing.Optional[PriceListItem] = None
-  request: typing.Optional[Request] = None
 
 
 # ---
@@ -2934,79 +3244,6 @@ class RequestDraft:
   
   group_ref: typing.Optional[Group] = None
   scientist_ref: typing.Optional[Scientist] = None
-
-
-# ---
-
-def plainToRequestInvoiceItem(json: dict) -> RequestInvoiceItem:
-  obj = RequestInvoiceItem()
-  obj.category = json.get('category')
-  obj.code = json.get('code')
-  obj.count = json.get('count')
-  obj.description = json.get('description')
-  obj.discount = json.get('discount')
-  obj.heading = json.get('heading')
-  obj.id = json.get('id')
-  obj.item_id = json.get('item_id')
-  obj.manual = bool(json.get('manual'))
-  obj.price = json.get('price')
-  obj.reason = json.get('reason')
-  obj.request_id = json.get('request_id')
-  obj.sent_date = datetime.fromisoformat(json.get('sent_date', '')) if json.get('sent_date') else None
-  obj.sort_order = json.get('sort_order')
-  obj.status = json.get('status')
-  obj.total = json.get('total')
-  obj.item = plainToPriceListItem(json['item']) if json.get('item') else None
-  obj.request = plainToRequest(json['request']) if json.get('request') else None
-
-  return obj
-
-def serializeRequestInvoiceItem(obj: RequestInvoiceItem) -> dict:
-  json = {}
-  json['category'] = obj.category
-  json['code'] = obj.code
-  json['count'] = obj.count
-  json['description'] = obj.description
-  json['discount'] = obj.discount
-  json['heading'] = obj.heading
-  json['id'] = obj.id
-  json['item_id'] = obj.item_id
-  json['manual'] = obj.manual
-  json['price'] = obj.price
-  json['reason'] = obj.reason
-  json['request_id'] = obj.request_id
-  json['sent_date'] = obj.sent_date.isoformat() if obj.sent_date else None
-  json['sort_order'] = obj.sort_order
-  json['status'] = obj.status
-  json['total'] = obj.total
-  json['item'] = serializePriceListItem(obj.item) if obj.item is not None else None
-  json['request'] = serializeRequest(obj.request) if obj.request is not None else None
-
-  return json
-
-
-@dataclass
-class RequestInvoiceItem:
-  category: typing.Optional[str] = None
-  code: typing.Optional[str] = None
-  count: typing.Optional[typing.Union[int, float]] = None
-  description: typing.Optional[str] = None
-  discount: typing.Optional[typing.Union[int, float]] = None
-  heading: typing.Optional[str] = None
-  id: typing.Optional[typing.Union[int, float]] = None
-  item_id: typing.Optional[typing.Union[int, float]] = None
-  manual: typing.Optional[bool] = None
-  price: typing.Optional[typing.Union[int, float]] = None
-  reason: typing.Optional[str] = None
-  request_id: typing.Optional[typing.Union[int, float]] = None
-  sent_date: typing.Optional[datetime] = None
-  sort_order: typing.Optional[str] = None
-  status: typing.Optional[str] = None
-  total: typing.Optional[typing.Union[int, float]] = None
-
-  
-  item: typing.Optional[PriceListItem] = None
-  request: typing.Optional[Request] = None
 
 
 # ---
@@ -3631,6 +3868,7 @@ def plainToSample(json: dict) -> Sample:
   obj.control_for = [ plainToControlSample(o) for o in json['control_for'] ] if json.get('control_for') else []
   obj.control_samples = [ plainToControlSample(o) for o in json['control_samples'] ] if json.get('control_samples') else []
   obj.controls = [ plainToSample(o) for o in json['controls'] ] if json.get('controls') else []
+  obj.cutout_size_ref = plainToCutoutSize(json['cutout_size_ref']) if json.get('cutout_size_ref') else None
   obj.data_entries = [ plainToDataEntry(o) for o in json['data_entries'] ] if json.get('data_entries') else []
   obj.group_ref = plainToGroup(json['group_ref']) if json.get('group_ref') else None
   obj.inline_adaptor = plainToTag(json['inline_adaptor']) if json.get('inline_adaptor') else None
@@ -3714,6 +3952,7 @@ def serializeSample(obj: Sample) -> dict:
     json['control_samples'] = [ serializeControlSample(o) for o in obj.control_samples ]
   if obj.controls is not None:
     json['controls'] = [ serializeSample(o) for o in obj.controls ]
+  json['cutout_size_ref'] = serializeCutoutSize(obj.cutout_size_ref) if obj.cutout_size_ref is not None else None
   if obj.data_entries is not None:
     json['data_entries'] = [ serializeDataEntry(o) for o in obj.data_entries ]
   json['group_ref'] = serializeGroup(obj.group_ref) if obj.group_ref is not None else None
@@ -3802,6 +4041,7 @@ class Sample:
   control_for: list[ControlSample] = field(default_factory=list)
   control_samples: list[ControlSample] = field(default_factory=list)
   controls: list[Sample] = field(default_factory=list)
+  cutout_size_ref: typing.Optional[CutoutSize] = None
   data_entries: list[DataEntry] = field(default_factory=list)
   group_ref: typing.Optional[Group] = None
   inline_adaptor: typing.Optional[Tag] = None
@@ -4074,6 +4314,8 @@ def serializeScientist(obj: Scientist) -> dict:
   if obj.samples is not None:
     json['samples'] = [ serializeSample(o) for o in obj.samples ]
 
+  json['groups'] = [ serializeGroup(g) for g in obj.groups ]
+  json['is_admin'] = obj.is_admin
   return json
 
 
@@ -4474,6 +4716,7 @@ def plainToSuperMulti(json: dict) -> SuperMulti:
   obj = SuperMulti()
   obj.description = json.get('description')
   obj.id = json.get('id')
+  obj.unique_dual_required = bool(json.get('unique_dual_required'))
   obj.request_lanes = [ plainToRequestLane(o) for o in json['request_lanes'] ] if json.get('request_lanes') else []
 
   return obj
@@ -4482,6 +4725,7 @@ def serializeSuperMulti(obj: SuperMulti) -> dict:
   json = {}
   json['description'] = obj.description
   json['id'] = obj.id
+  json['unique_dual_required'] = obj.unique_dual_required
   if obj.request_lanes is not None:
     json['request_lanes'] = [ serializeRequestLane(o) for o in obj.request_lanes ]
 
@@ -4492,6 +4736,7 @@ def serializeSuperMulti(obj: SuperMulti) -> dict:
 class SuperMulti:
   description: typing.Optional[str] = None
   id: typing.Optional[typing.Union[int, float]] = None
+  unique_dual_required: typing.Optional[bool] = None
 
   
   request_lanes: list[RequestLane] = field(default_factory=list)
@@ -4769,79 +5014,6 @@ class EstimateRequest:
 
 # ---
 
-def plainToCostEstimate(json: dict) -> CostEstimate:
-  obj = CostEstimate()
-  obj.category_totals = json.get('category_totals')
-  obj.items = [ plainToRequestCostEstimateItem(o) for o in json['items'] ] if json.get('items') else []
-  obj.price_list = plainToPriceList(json['price_list']) if json.get('price_list') else None
-  obj.request = plainToEstimateRequest(json['request']) if json.get('request') else None
-  obj.total = json.get('total')
-
-  return obj
-
-def serializeCostEstimate(obj: CostEstimate) -> dict:
-  json = {}
-  json['category_totals'] = obj.category_totals
-  if obj.items is not None:
-    json['items'] = [ serializeRequestCostEstimateItem(o) for o in obj.items ]
-  json['price_list'] = serializePriceList(obj.price_list) if obj.price_list is not None else None
-  json['request'] = serializeEstimateRequest(obj.request) if obj.request is not None else None
-  json['total'] = obj.total
-
-  return json
-
-
-@dataclass
-class CostEstimate:
-  category_totals: typing.Optional[dict] = None
-  items: list[RequestCostEstimateItem]=field(default_factory=list)
-  price_list: typing.Optional[PriceList] = None
-  request: typing.Optional[EstimateRequest] = None
-  total: typing.Optional[typing.Union[int, float]] = None
-
-  
-  
-
-# ---
-
-def plainToInvoice(json: dict) -> Invoice:
-  obj = Invoice()
-  obj.category_totals = json.get('category_totals')
-  obj.items = [ plainToRequestInvoiceItem(o) for o in json['items'] ] if json.get('items') else []
-  obj.price_list = plainToPriceList(json['price_list']) if json.get('price_list') else None
-  obj.request = plainToEstimateRequest(json['request']) if json.get('request') else None
-  obj.status = json.get('status')
-  obj.total = json.get('total')
-
-  return obj
-
-def serializeInvoice(obj: Invoice) -> dict:
-  json = {}
-  json['category_totals'] = obj.category_totals
-  if obj.items is not None:
-    json['items'] = [ serializeRequestInvoiceItem(o) for o in obj.items ]
-  json['price_list'] = serializePriceList(obj.price_list) if obj.price_list is not None else None
-  json['request'] = serializeEstimateRequest(obj.request) if obj.request is not None else None
-  json['status'] = obj.status
-  json['total'] = obj.total
-
-  return json
-
-
-@dataclass
-class Invoice:
-  category_totals: typing.Optional[dict] = None
-  items: list[RequestInvoiceItem]=field(default_factory=list)
-  price_list: typing.Optional[PriceList] = None
-  request: typing.Optional[EstimateRequest] = None
-  status: typing.Optional[str] = None
-  total: typing.Optional[typing.Union[int, float]] = None
-
-  
-  
-
-# ---
-
 def plainToVirtualBill(json: dict) -> VirtualBill:
   obj = VirtualBill()
   obj.category_totals = json.get('category_totals')
@@ -5079,49 +5251,6 @@ class ZammadTicket:
   title: typing.Optional[str] = None
   updated_at: typing.Optional[datetime] = None
   url: typing.Optional[str] = None
-
-  
-  
-
-# ---
-
-def plainToAnalysisPipeline(json: dict) -> AnalysisPipeline:
-  obj = AnalysisPipeline()
-  obj.available = bool(json.get('available'))
-  obj.description = json.get('description')
-  obj.external = bool(json.get('external'))
-  obj.id = json.get('id')
-  obj.long_description = json.get('long_description')
-  obj.name = json.get('name')
-  obj.platform = json.get('platform')
-  obj.pricing_item_name = json.get('pricing_item_name')
-
-  return obj
-
-def serializeAnalysisPipeline(obj: AnalysisPipeline) -> dict:
-  json = {}
-  json['available'] = obj.available
-  json['description'] = obj.description
-  json['external'] = obj.external
-  json['id'] = obj.id
-  json['long_description'] = obj.long_description
-  json['name'] = obj.name
-  json['platform'] = obj.platform
-  json['pricing_item_name'] = obj.pricing_item_name
-
-  return json
-
-
-@dataclass
-class AnalysisPipeline:
-  available: typing.Optional[bool] = None
-  description: typing.Optional[str] = None
-  external: typing.Optional[bool] = None
-  id: typing.Optional[typing.Union[int, float]] = None
-  long_description: typing.Optional[str] = None
-  name: typing.Optional[str] = None
-  platform: typing.Optional[str] = None
-  pricing_item_name: typing.Optional[str] = None
 
   
   
