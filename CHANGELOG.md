@@ -1,3 +1,7 @@
+# v1.1.0 (2022-04-27)
+
+- refactor list commands with explicit paging
+
 # v1.0.2 (2022-04-27)
 
 - update models
