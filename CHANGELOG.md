@@ -1,6 +1,7 @@
-# v1.0.2 (2022-04-26)
+# v1.0.2 (2022-04-27)
 
 - update models
+- api key deserialization with session user
 
 # v1.0.1 (2022-03-10)
 
