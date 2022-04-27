@@ -15,24 +15,24 @@ logger = logging.getLogger()
 
 @dataclass
 class PagedResponse:
-  items: list[typing.Any] = field(default_factory=list)
+  items: typing.List[typing.Any] = field(default_factory=list)
   total_items: int = 0
 
 @dataclass
 class SamplePagedResponse(PagedResponse):
-  items: list[Sample] = field(default_factory=list)
+  items: typing.List[Sample] = field(default_factory=list)
 
 @dataclass
 class SequencedSamplePagedResponse(PagedResponse):
-  items: list[SequencedSample] = field(default_factory=list)
+  items: typing.List[SequencedSample] = field(default_factory=list)
 
 @dataclass
 class MultiplexPagedResponse(PagedResponse):
-  items: list[Multiplex] = field(default_factory=list)
+  items: typing.List[Multiplex] = field(default_factory=list)
 
 @dataclass
 class RequestPagedResponse(PagedResponse):
-  items: list[Request] = field(default_factory=list)
+  items: typing.List[Request] = field(default_factory=list)
 
 class FskError(Exception):
   def __init__(self, code, detail, status=None, doclink=None, line=None, **kwargs):
@@ -263,11 +263,11 @@ class FskApi:
       base += '.csv'
     return base
   
-  def list_sequenced_samples(self, params: typing.Optional[FskQuery] = None, admin=False) -> list[SequencedSample]:
+  def list_sequenced_samples(self, params: typing.Optional[FskQuery] = None, admin=False) -> typing.List[SequencedSample]:
     ret = self.get(self._sequenced_samples_url(admin=admin), params=params)
     return [ plainToSequencedSample(o) for o in ret ]
   
-  def admin_list_sequenced_samples(self, params: typing.Optional[FskQuery] = None) -> list[SequencedSample]:
+  def admin_list_sequenced_samples(self, params: typing.Optional[FskQuery] = None) -> typing.List[SequencedSample]:
     return self.list_sequenced_samples(params, admin=True)
   
   def list_sequenced_samples_csv(self, params: typing.Optional[FskQuery] = None, admin=False) -> str:
@@ -290,14 +290,14 @@ class FskApi:
       base += '.csv'
     return base
   
-  def list_samples(self, params:typing.Optional[FskQuery]=None, admin=False, group=False) -> list[Sample]:
+  def list_samples(self, params:typing.Optional[FskQuery]=None, admin=False, group=False) -> typing.List[Sample]:
     ret = self.get(self._list_samples_url(admin=admin, group=group), params=params)
     return [ plainToSample(s) for s in ret ]
   
-  def admin_list_samples(self, params:typing.Optional[FskQuery]=None) -> list[Sample]:
+  def admin_list_samples(self, params:typing.Optional[FskQuery]=None) -> typing.List[Sample]:
     return self.list_samples(admin=True, params=params)
 
-  def list_group_samples(self, params:typing.Optional[FskQuery]=None) -> list[Sample]:
+  def list_group_samples(self, params:typing.Optional[FskQuery]=None) -> typing.List[Sample]:
     return self.list_samples(group=True, params=params)
   
   def list_samples_csv(self, params:typing.Optional[FskQuery]=None, admin=False, group=False) -> str:
@@ -310,7 +310,7 @@ class FskApi:
   def get_sample(self, id) -> Sample:
     return plainToSample(self.get("/api/samples/{id}".format(id=id)))
 
-  def get_sample_sequencing_runs(self, sample_id) -> list[SequencedSample]:
+  def get_sample_sequencing_runs(self, sample_id) -> typing.List[SequencedSample]:
     return [ plainToSequencedSample(r) for r in self.get(f"/api/samples/{sample_id}/sequencing") ]
   
   def get_sample_sequencing_runs_csv(self, sample_id) -> str:
@@ -329,10 +329,10 @@ class FskApi:
       base += 'csv'
     return base
 
-  def list_multis(self, params:typing.Optional[FskQuery]=None, admin=False) -> list[Multiplex]:
+  def list_multis(self, params:typing.Optional[FskQuery]=None, admin=False) -> typing.List[Multiplex]:
     return [ plainToMultiplex(m) for m in self.get(self._list_multis_url(admin=admin), params=params) ]
   
-  def admin_list_multis(self, params:typing.Optional[FskQuery]=None) -> list[Multiplex]:
+  def admin_list_multis(self, params:typing.Optional[FskQuery]=None) -> typing.List[Multiplex]:
     return self.list_multis(admin=True, params=params)
 
   def list_multis_csv(self, params:typing.Optional[FskQuery]=None, admin=False) -> str:
@@ -351,7 +351,7 @@ class FskApi:
       base += '.csv'
     return base
   
-  def list_requests(self, params:typing.Optional[FskQuery]=None, admin=False) -> list[Request]:
+  def list_requests(self, params:typing.Optional[FskQuery]=None, admin=False) -> typing.List[Request]:
     return [ plainToRequest(r) for r in self.get(self._list_request_url(admin=admin), params=params) ]
 
   def list_requests_csv(self, params:typing.Optional[FskQuery]=None, admin=False) -> str:
@@ -361,7 +361,7 @@ class FskApi:
     ret = self.get(self._list_request_url(admin=admin), params=params)
     return RequestPagedResponse(items=[ plainToRequest(r) for r in ret.get('items', []) ], total_items=ret.get('total_items', 0))
   
-  def admin_list_requests(self, params:typing.Optional[FskQuery]=None) -> list[Request]:
+  def admin_list_requests(self, params:typing.Optional[FskQuery]=None) -> typing.List[Request]:
     return self.list_requests(params, admin=True)
 
   def post_datafile(self, path, link=None, size=None, md5=None, hash=None, filetype='Misc'):
