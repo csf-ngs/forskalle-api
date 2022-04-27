@@ -13,7 +13,7 @@ from forskalle_api.auto.queryparams import SampleFilters, SequencedSampleFilters
 logger = logging.getLogger(__name__)
 click_log.basic_config(logger)
 
-def make_query(filters, limit, page):
+def make_query(filters, limit=None, page=0):
   if page != 0:
     query = FskPagedQuery(filters=filters, page=page, limit=limit)
   else:
@@ -80,12 +80,15 @@ def get_barcodes(obj: FskApi, identifier, platform='Illumina'):
 @click.pass_obj
 def list_sequenced_samples(obj: FskApi, sample, multi, request, limit, page, csv, admin):
   filters = SequencedSampleFilters(sample_id=sample, multi_id=multi, request_id=request)
-  ret = FskApi().list_sequenced_samples(make_query(filters, limit, page), csv, admin)
+  query = make_query(filters, limit, page)
   if csv:
-    click.echo(ret)
+    click.echo(FskApi().list_sequenced_samples_csv(query, admin=admin))
+  elif page != 0:
+    ret = FskApi().list_sequenced_samples_paged(typing.cast(FskPagedQuery, query), admin=admin)
+    click.echo(json.dumps([ serializeSequencedSample(s) for s in ret.items ], indent=2, sort_keys=True))
   else:
-    click.echo(json.dumps([ serializeSequencedSample(s) for s in ret if type(s) is SequencedSample ], indent=2, sort_keys=True))
-
+    ret = FskApi().list_sequenced_samples(query, admin=admin)
+    click.echo(json.dumps([ serializeSequencedSample(s) for s in ret ], indent=2, sort_keys=True))
 
 @cli.command(short_help='update sequencing run status for a sample (admin only)')
 @click.argument('sample_id')
@@ -147,11 +150,15 @@ def multis():
 @click.pass_obj
 def list_multis(obj: FskApi, scientist, group, limit, page, csv, admin):
   filters = MultiplexFilters(scientist=scientist, group=group)
-  ret = FskApi().list_multis(make_query(filters, limit, page), csv, admin)
+  query = make_query(filters, limit, page)
   if csv:
-    click.echo(ret)
+    click.echo(FskApi().list_multis_csv(query, admin=admin))
+  elif page != 0:
+    ret = FskApi().list_multis_paged(typing.cast(FskPagedQuery, query), admin=admin)
+    click.echo(json.dumps([ serializeMultiplex(s) for s in ret.items ], indent=2, sort_keys=True))
   else:
-    click.echo(json.dumps(ret, indent=2))
+    ret = FskApi().list_multis(query, admin=admin)
+    click.echo(json.dumps([ serializeMultiplex(s) for s in ret ], indent=2, sort_keys=True))
 
   
 @multis.command(short_help='get multiplex metadata', name='get')
@@ -177,11 +184,15 @@ def requests():
 @click.pass_obj
 def list_requests(obj: FskApi, scientist, group, limit, page, csv, admin):
   filters = RequestFilters(scientist=scientist, group=group)
-  ret = FskApi().list_requests(make_query(filters, limit, page), csv, admin)
+  query = make_query(filters, limit, page)
   if csv:
-    click.echo(ret)
+    click.echo(FskApi().list_requests_csv(query, admin=admin))
+  elif page != 0:
+    ret = FskApi().list_requests_paged(typing.cast(FskPagedQuery, query), admin=admin)
+    click.echo(json.dumps([ serializeRequest(s) for s in ret.items ], indent=2, sort_keys=True))
   else:
-    click.echo(json.dumps([ serializeRequest(r) for r in ret if type(r) is Request ], indent=2, sort_keys=True))
+    ret = FskApi().list_requests(query, admin=admin)
+    click.echo(json.dumps([ serializeRequest(s) for s in ret ], indent=2, sort_keys=True))
 
 @requests.command(short_help='get metadata', name='get')
 @click.argument('id')
@@ -228,13 +239,17 @@ def samples():
 @click.option('--csv', is_flag=True)
 @click.option('--admin', is_flag=True, help='Show all users, available only with admin key')
 @click.pass_obj
-def list_samples(obj: FskApi, id_from, id_to, scientist, group, limit, page, csv, admin):
+def list_samples(obj: FskApi, id_from, id_to, scientist, group, limit, page, csv, admin, group_list=False):
   filters = SampleFilters(id_from=id_from, id_to=id_to, scientist=scientist, group=group)
-  ret = FskApi().list_samples(make_query(filters, limit, page), csv, admin)
+  query = make_query(filters, limit, page)
   if csv:
-    click.echo(ret)
+    click.echo(FskApi().list_samples_csv(query, admin=admin, group=group_list))
+  elif page != 0:
+    ret = FskApi().list_samples_paged(typing.cast(FskPagedQuery, query), admin=admin, group=group_list)
+    click.echo(json.dumps([ serializeSample(s) for s in ret.items ], indent=2, sort_keys=True))
   else:
-    click.echo(json.dumps([ serializeSample(s) for s in ret if type(s) is Sample ], indent=2, sort_keys=True))
+    ret = FskApi().list_samples(query, admin=admin, group=group_list)
+    click.echo(json.dumps([ serializeSample(s) for s in ret ], indent=2, sort_keys=True))
 
 @samples.command(short_help='list samples of all groups you belong to', name='list-group')
 @click.option('--id_from', help='min id', type=int)
@@ -245,13 +260,9 @@ def list_samples(obj: FskApi, id_from, id_to, scientist, group, limit, page, csv
 @click.option('--page', '-p', help='Page (to return next [limit] rows', type=int, default=1)
 @click.option('--csv', is_flag=True)
 @click.pass_obj
-def list_group_samples(obj: FskApi, id_from, id_to, scientist, group, limit, page, csv):
-  filters = SampleFilters(id_from=id_from, id_to=id_to, scientist=scientist, group=group)
-  ret = FskApi().list_group_samples(make_query(filters, limit, page), csv)
-  if csv:
-    click.echo(ret)
-  else:
-    click.echo(json.dumps([ serializeSample(s) for s in ret if type(s) is Sample ], indent=2, sort_keys=True))
+@click.pass_context
+def list_group_samples(ctx, obj: FskApi, id_from, id_to, scientist, group, limit, page, csv):
+  ctx.invoke(list_samples, id_from=id_from, id_to=id_to, scientist=scientist, group=group, limit=limit, page=page, csv=csv, admin=False, group_list=True)
 
 
 @samples.command(short_help='get sample metadata', name='get')

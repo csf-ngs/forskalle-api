@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 import typing
 import click
 from forskalle_api.auto.models import ApiKey, Group, Lane, Multiplex, Nanostat, OntFlowcellRun, OntRun, PacbioRun, Request, RunUnit, Sample, Scientist, IlluminaRun, SequencedBarcode, SequencedSample, SmrtCell, Subreadstat, plainToApiKey, plainToGroup, plainToIlluminaRun, plainToLane, plainToMultiplex, plainToNanostat, plainToOntFlowcellRun, plainToOntRun, plainToPacbioRun, plainToRequest, plainToRunUnit, plainToSample, plainToScientist, plainToSequencedBarcode, plainToSequencedSample, plainToSmrtCell, plainToSubreadstat, RequestsSample, plainToRequestsSample
@@ -8,7 +9,30 @@ import os.path
 from uuid import uuid4
 
 import logging
+
+from forskalle_api.fsk_query import FskPagedQuery, FskQuery
 logger = logging.getLogger()
+
+@dataclass
+class PagedResponse:
+  items: list[typing.Any] = field(default_factory=list)
+  total_items: int = 0
+
+@dataclass
+class SamplePagedResponse(PagedResponse):
+  items: list[Sample] = field(default_factory=list)
+
+@dataclass
+class SequencedSamplePagedResponse(PagedResponse):
+  items: list[SequencedSample] = field(default_factory=list)
+
+@dataclass
+class MultiplexPagedResponse(PagedResponse):
+  items: list[Multiplex] = field(default_factory=list)
+
+@dataclass
+class RequestPagedResponse(PagedResponse):
+  items: list[Request] = field(default_factory=list)
 
 class FskError(Exception):
   def __init__(self, code, detail, status=None, doclink=None, line=None, **kwargs):
@@ -17,10 +41,10 @@ class FskError(Exception):
     self.detail = detail
     self.doclink = doclink
     self.line = line
-    self.args = kwargs
+    self.args: dict = kwargs
   
   def __str__(self):
-    return "FSK-ERROR: {status} {code} {detail}".format(status=self.status, code=self.code, detail=self.detail)
+    return f"FSK-ERROR: {self.status} {self.code} {self.detail}"
 
 class FskApi:
   config_file = '~/.fsk_api.yml'
@@ -183,7 +207,7 @@ class FskApi:
     if path:
       (path, link, absolute_link, size, hash) = self._prepare_datafile(path, link, size, hash)
     else:
-      absolute_link = link
+      absolute_link = typing.cast(str, link)
       if not absolute_link.startswith('http'):
         absolute_link = f"https://ngs.vbcf.ac.at/filemanager/byurl/{absolute_link}"
     
@@ -231,81 +255,115 @@ class FskApi:
   def publish_nanopore_report(self, run_id, report_url) -> OntFlowcellRun:
     return plainToOntFlowcellRun(self.post("/api/runs/ont/flowcell_runs/{run_id}".format(run_id=run_id), { 'report_url': report_url }))
   
-  def list_sequenced_samples(self, params=None, csv=False, admin=False) -> typing.Union[str, typing.List[SequencedSample]]:
+  def _sequenced_samples_url(self, csv=False, admin=False) -> str:
     base = "/api/sequenced_samples"
     if admin:
       base += "/admin"
     if csv:
-      return self.get_csv(base+".csv", params=params)
-    else:
-      ret = self.get(base, params=params)
-      return [ plainToSequencedSample(o) for o in ret.get('items', ret) ]
-
-  def admin_list_sequenced_samples(self, params=None, csv=False) -> typing.Union[str, typing.List[SequencedSample]]:
-    return self.list_sequenced_samples(params, csv, admin=True)
-
+      base += '.csv'
+    return base
+  
+  def list_sequenced_samples(self, params: typing.Optional[FskQuery] = None, admin=False) -> list[SequencedSample]:
+    ret = self.get(self._sequenced_samples_url(admin=admin), params=params)
+    return [ plainToSequencedSample(o) for o in ret ]
+  
+  def admin_list_sequenced_samples(self, params: typing.Optional[FskQuery] = None) -> list[SequencedSample]:
+    return self.list_sequenced_samples(params, admin=True)
+  
+  def list_sequenced_samples_csv(self, params: typing.Optional[FskQuery] = None, admin=False) -> str:
+    return self.get_csv(self._sequenced_samples_url(csv=True, admin=admin), params=params)
+  
+  def list_sequenced_samples_paged(self, params: typing.Optional[FskPagedQuery]=None, admin=False) -> SequencedSamplePagedResponse:
+    ret = self.get(self._sequenced_samples_url(admin=admin), params=params)
+    return SequencedSamplePagedResponse(items=[ plainToSequencedSample(o) for o in ret.get('items', []) ], total_items=ret.get('total_items', 0))
+  
   def get_sequenced_sample(self, id) -> SequencedSample:
     return plainToSequencedSample(self.get("/api/sequenced_samples/{id}".format(id=id)))
 
-  def list_samples(self, params=None, csv=False, admin=False, group=False) -> typing.Union[str,typing.List[Sample]]:
+  def _list_samples_url(self, csv=False, admin=False, group=False) -> str:
     base = "/api/samples"
     if admin:
       base += "/admin"
     elif group:
       base += '/group'
     if csv:
-      return self.get_csv(base+".csv", params=params)
-    else:
-      ret = self.get(base, params=params)
-      return [ plainToSample(s) for s in ret.get('items', ret) ]
+      base += '.csv'
+    return base
   
-  def list_group_samples(self, params=None, csv=False) -> typing.Union[str,typing.List[Sample]]:
-    return self.list_samples(params, csv, group=True)
+  def list_samples(self, params:typing.Optional[FskQuery]=None, admin=False, group=False) -> list[Sample]:
+    ret = self.get(self._list_samples_url(admin=admin, group=group), params=params)
+    return [ plainToSample(s) for s in ret ]
   
-  def admin_list_samples(self, params=None, csv=False) -> typing.Union[str,typing.List[Sample]]:
-    return self.list_samples(params, csv, admin=True)
+  def admin_list_samples(self, params:typing.Optional[FskQuery]=None) -> list[Sample]:
+    return self.list_samples(admin=True, params=params)
+
+  def list_group_samples(self, params:typing.Optional[FskQuery]=None) -> list[Sample]:
+    return self.list_samples(group=True, params=params)
+  
+  def list_samples_csv(self, params:typing.Optional[FskQuery]=None, admin=False, group=False) -> str:
+    return self.get_csv(self._list_samples_url(csv=True, admin=admin, group=group), params=params)
+
+  def list_samples_paged(self, params:typing.Optional[FskPagedQuery]=None, admin=False, group=False) -> SamplePagedResponse:
+    ret = self.get(self._list_samples_url(admin=admin, group=group), params=params)
+    return SamplePagedResponse(items=[ plainToSample(s) for s in ret.get('items', []) ], total_items=ret.get('total_items', 0))
 
   def get_sample(self, id) -> Sample:
     return plainToSample(self.get("/api/samples/{id}".format(id=id)))
 
-  def get_sample_sequencing_runs(self, sample_id, csv=False) -> typing.Union[str, typing.List[SequencedSample]]:
-    url = "/api/samples/{sample_id}/sequencing".format(sample_id=sample_id)
-    if csv:
-      return self.get_csv(url+'.csv')
-    else:
-      return [ plainToSequencedSample(r) for r in self.get(url) ]
+  def get_sample_sequencing_runs(self, sample_id) -> list[SequencedSample]:
+    return [ plainToSequencedSample(r) for r in self.get(f"/api/samples/{sample_id}/sequencing") ]
+  
+  def get_sample_sequencing_runs_csv(self, sample_id) -> str:
+    return self.get_csv(f"/api/samples/{sample_id}/sequencing.csv")
     
   def get_sample_requests(self, sample_id) -> typing.List[RequestsSample]:
     url = f"/api/samples/{sample_id}?include_requests=1"
     return [ plainToRequestsSample(rs) for rs in self.get(url)['requests_samples'] ]
 
-
-  
   def get_multi(self, id) -> Multiplex:
     return plainToMultiplex(self.get('/api/multiplexes/{multi_id}'.format(multi_id=id)))
   
-  def list_multis(self, params=None, csv=False, admin=False) -> typing.Union[str, typing.List[Multiplex]]:
+  def _list_multis_url(self, csv=False, admin=False) -> str:
     base = "/api/multiplexes"+("/admin" if admin else "")
     if csv:
-      return self.get_csv(base+".csv", params=params)
-    else:
-      ret = self.get(base, params=params)
-      return [ plainToMultiplex(m) for m in ret.get('items', ret) ]
-    
+      base += 'csv'
+    return base
+
+  def list_multis(self, params:typing.Optional[FskQuery]=None, admin=False) -> list[Multiplex]:
+    return [ plainToMultiplex(m) for m in self.get(self._list_multis_url(admin=admin), params=params) ]
+  
+  def admin_list_multis(self, params:typing.Optional[FskQuery]=None) -> list[Multiplex]:
+    return self.list_multis(admin=True, params=params)
+
+  def list_multis_csv(self, params:typing.Optional[FskQuery]=None, admin=False) -> str:
+    return self.get_csv(self._list_multis_url(csv=True, admin=admin))
+
+  def list_multis_paged(self, params:typing.Optional[FskPagedQuery]=None, admin=False) -> MultiplexPagedResponse:
+    ret = self.get(self._list_multis_url(admin=admin), params=params)
+    return MultiplexPagedResponse(items=[ plainToMultiplex(m) for m in ret.get('items', []) ], total_items=ret.get('total_items', 0))
+
   def get_request(self, id) -> Request:
     return plainToRequest(self.get("/api/requests/{request_id}".format(request_id=id)))
     
-  def admin_list_multis(self, params=None, csv=False) -> typing.Union[str, typing.List[Multiplex]]:
-    return self.list_multis(params, csv, admin=True)
-  
-  def list_requests(self, params=None, csv=False, admin=False) -> typing.Union[str, typing.List[Request]]:
+  def _list_request_url(self, csv=False, admin=False) -> str:
     base = "/api/requests"+("/admin" if admin else "")
     if csv:
-      return self.get_csv(base+".csv", params=params)
-    else:
-      ret = self.get(base, params=params)
-      return [ plainToRequest(r) for r in ret.get('items', ret) ]
+      base += '.csv'
+    return base
   
+  def list_requests(self, params:typing.Optional[FskQuery]=None, admin=False) -> list[Request]:
+    return [ plainToRequest(r) for r in self.get(self._list_request_url(admin=admin), params=params) ]
+
+  def list_requests_csv(self, params:typing.Optional[FskQuery]=None, admin=False) -> str:
+    return self.get_csv(self._list_request_url(csv=True, admin=admin), params=params)
+
+  def list_requests_paged(self, params:typing.Optional[FskQuery]=None, admin=False) -> RequestPagedResponse:
+    ret = self.get(self._list_request_url(admin=admin), params=params)
+    return RequestPagedResponse(items=[ plainToRequest(r) for r in ret.get('items', []) ], total_items=ret.get('total_items', 0))
+  
+  def admin_list_requests(self, params:typing.Optional[FskQuery]=None) -> list[Request]:
+    return self.list_requests(params, admin=True)
+
   def post_datafile(self, path, link=None, size=None, md5=None, hash=None, filetype='Misc'):
     if md5:
       logger.warn(f"using deprecated md5 parameter, should be hash")
