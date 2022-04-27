@@ -87,6 +87,7 @@ def plainToApiKey(json: dict) -> ApiKey:
   obj.routes = [ plainToApiKeyRoute(o) for o in json['routes'] ] if json.get('routes') else []
   obj.scientist_ref = plainToScientist(json['scientist_ref']) if json.get('scientist_ref') else None
 
+  obj.user = plainToSessionUser(json['user']) if json.get('user') else None
   return obj
 
 def serializeApiKey(obj: ApiKey) -> dict:
@@ -125,6 +126,7 @@ class ApiKey:
   routes: list[ApiKeyRoute] = field(default_factory=list)
   scientist_ref: typing.Optional[Scientist] = None
 
+  user: typing.Optional[SessionUser] = None
 
 # ---
 
@@ -858,6 +860,14 @@ class Group:
   requests: list[Request] = field(default_factory=list)
   scientists: list[Scientist] = field(default_factory=list)
 
+
+@dataclass
+class SessionGroup(Group):
+  pass
+
+def plainToSessionGroup(json: dict) -> SessionGroup:
+  obj = typing.cast(SessionGroup, plainToGroup(json))
+  return obj
 
 # ---
 
@@ -4358,6 +4368,17 @@ class Scientist:
   @property
   def fullname(self) -> str:
     return f"{self.firstname} {self.lastname}"
+
+@dataclass
+class SessionUser(Scientist):
+  primary_group: typing.Optional[SessionGroup] = None
+  groups: list[SessionGroup] = field(default_factory=list)
+
+def plainToSessionUser(json: dict) -> SessionUser:
+  obj = typing.cast(SessionUser, plainToScientist(json))
+  obj.primary_group = plainToSessionGroup(json['primary_group']) if json.get('primary_group') else None
+  obj.groups = [ plainToSessionGroup(o) for o in json['groups'] ] if json.get('groups') else []
+  return obj
 
 # ---
 
