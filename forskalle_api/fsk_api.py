@@ -49,7 +49,7 @@ class FskError(Exception):
 class FskApi:
   config_file = '~/.fsk_api.yml'
 
-  def __init__(self, base=None, key=None):
+  def __init__(self, base=None, key=None) -> None:
     if not base:
       base = os.environ.get('FSK_API_BASE')
     if not key:
